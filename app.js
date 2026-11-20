@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '1.7';
+const VERSION = '1.8';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
@@ -610,7 +610,7 @@ function quizView(tab) {
   if (!done) h += `<button class="btn primary" data-act="check" data-tab="${tab}">${pick.size ? 'Prüfen' : 'Prüfen (nichts angekreuzt)'}</button>`;
   else if (!last) h += `<button class="btn primary" data-act="next" data-tab="${tab}">Weiter</button>`;
   else h += `<button class="btn primary" data-act="finish" data-tab="${tab}">Auswertung</button>`;
-  h += `</div></div>`;
+  h += `</div></div><p class="keys">1–4 ankreuzen · Enter prüfen/weiter · ← → blättern · Esc zurück</p>`;
   return h;
 }
 
@@ -645,7 +645,7 @@ function examView() {
   if (r.pos > 0) h += `<button class="btn plain" data-act="xprev">Zurück</button>`;
   if (r.seenGrid) h += `<button class="btn plain icon" data-act="grid" aria-label="Gesamtansicht">${GRID_ICO}</button>`;
   h += last ? `<button class="btn primary" data-act="grid">Zur Übersicht</button>` : `<button class="btn primary" data-act="xnext">Weiter</button>`;
-  h += `</div></div>`;
+  h += `</div></div><p class="keys">1–4 ankreuzen · U unsicher · ← → blättern · Enter weiter · G Übersicht</p>`;
   return h;
 }
 function gridView() {
@@ -1048,6 +1048,41 @@ view.addEventListener('click', e => {
 render();
 lastHash = location.hash;
 syncNow();
+
+/* Tastatur (Mac): nur Tastendrücke, Touch-Bedienung bleibt unberührt */
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const tg = e.target;
+  if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.isContentEditable)) return;
+  const press = sel => { const b = view.querySelector(sel); if (b && !b.disabled) { b.click(); return true; } return false; };
+  const k = e.key;
+  const hash = location.hash.slice(1) || 'mix';
+  const inExam = /^(quiz|grid)\/exam/.test(hash) && DB.open.exam;
+  const inQuiz = /^quiz\//.test(hash) && document.body.classList.contains('quiz');
+  let done = false;
+  const n = { 1: 'A', 2: 'B', 3: 'C', 4: 'D', a: 'A', b: 'B', c: 'C', d: 'D' }[k.toLowerCase()];
+  if (k === 'Escape') {
+    done = press('.back') || press('[data-act="leave"]');
+    if (!done && /^sum\//.test(hash)) { const r = DB.done.find(x => x.id === hash.split('/')[1]); go('#' + (r && r.tab !== 'exam' ? r.tab : 'mix')); done = true; }
+  } else if (inExam && hash.startsWith('quiz')) {
+    if (n && !e.repeat) done = press(`[data-act="xpick"][data-l="${n}"]`);
+    else if (k === 'ArrowRight') done = press('[data-act="xnext"]');
+    else if (k === 'ArrowLeft') done = press('[data-act="xprev"]');
+    else if (k === 'Enter') done = press('[data-act="xnext"]') || press('.btn.primary[data-act="grid"]');
+    else if (k.toLowerCase() === 'u' && !e.repeat) done = press('[data-act="flag"]');
+    else if (k.toLowerCase() === 'g') done = press('[data-act="grid"]');
+  } else if (inQuiz) {
+    if (n && !e.repeat) done = press(`[data-act="pick"][data-l="${n}"]`);
+    else if (k === 'Enter') done = press('[data-act="check"]') || press('[data-act="next"]') || press('[data-act="finish"]');
+    else if (k === 'ArrowRight') done = press('[data-act="next"]') || press('[data-act="finish"]');
+    else if (k === 'ArrowLeft') done = press('[data-act="prev"]');
+  } else if ((k === 'ArrowRight' || k === 'ArrowLeft') && !document.body.classList.contains('set') && !document.body.classList.contains('quiz')) {
+    const cur = ORDER.indexOf(hash.split('/')[0]);
+    const nx = cur + (k === 'ArrowRight' ? 1 : -1);
+    if (cur >= 0 && nx >= 0 && nx < ORDER.length) { go('#' + ORDER[nx]); done = true; }
+  }
+  if (done) e.preventDefault();
+});
 
 /* Wischen zwischen den Reitern (nicht in Prüfungen und Einstellungen) */
 let sw = null;
