@@ -255,3 +255,9 @@ body:not(.home):not(.quiz) main > h1, body:not(.home):not(.quiz) main > .sub { a
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+.pass { display: inline-block; margin: 10px 4px 2px; padding: 4px 12px; border-radius: 999px; font-size: 15px; font-weight: 600; }
+.pass.ok { color: var(--ok); background: var(--okbg); }
+.pass.bad { color: var(--bad); background: var(--badbg); }
+.okc { color: var(--ok); font-weight: 600; }
+.badc { color: var(--bad); font-weight: 600; }

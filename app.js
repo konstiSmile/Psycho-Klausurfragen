@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '1.1';
+const VERSION = '1.2';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
@@ -60,19 +60,22 @@ function fmtDate(ts) {
 function grade(q, a) {
   let n = 0;
   LETTERS.forEach(L => { if (q.k.includes(L) === a.includes(L)) n++; });
-  return { n, full: n === 4 };
+  /* Klausurwertung: +1 je richtig behandelter, −1 je falsch behandelter Aussage, nicht unter 0 → 0, 2 oder 4 Punkte */
+  return { n, full: n === 4, pts: Math.max(0, 2 * n - 4) };
 }
+const PASS = 0.6;
 function runStats(run) {
   const ids = run.ids.filter(id => run.ans[id] !== undefined);
-  let full = 0, stm = 0;
+  let full = 0, stm = 0, pts = 0;
   const wrong = [], unsure = [];
   ids.forEach(id => {
     const g = grade(BYID[id], run.ans[id]);
-    stm += g.n;
+    stm += g.n; pts += g.pts;
     if (g.full) full++; else wrong.push(id);
     if (BYID[id].m.includes('UNSICHER')) unsure.push(id);
   });
-  return { answered: ids.length, total: run.ids.length, full, stm, wrong, unsure, ids };
+  const max = 4 * ids.length;
+  return { answered: ids.length, total: run.ids.length, full, stm, pts, max, pass: max > 0 && pts >= PASS * max, wrong, unsure, ids };
 }
 /* Letzter Stand je Frage über alle Versuche */
 function lastStatus() {
@@ -168,7 +171,7 @@ function resumeCard(tab) {
   const pct = Math.round(100 * s.answered / s.total);
   return `<div class="label">Laufender Versuch</div><div class="resume">
     <div class="t">${esc(r.title)}</div>
-    <div class="d">${s.answered} von ${s.total} beantwortet · ${s.full} vollständig richtig</div>
+    <div class="d">${s.answered} von ${s.total} beantwortet · ${s.pts} von ${s.max} Punkten</div>
     <div class="bar"><i data-w="${pct}"></i></div>
     <div class="btns"><button class="btn primary" data-act="resume" data-tab="${tab}">Fortsetzen</button>
     ${s.answered ? `<button class="btn" data-act="finish" data-tab="${tab}">Auswerten</button>` : ''}
@@ -266,7 +269,7 @@ function quizView(tab) {
   h += `</div>`;
   if (done) {
     const g = grade(q, a);
-    h += `<div class="verdict ${g.full ? 'ok' : 'bad'}">${g.full ? 'Vollständig richtig' : `Nicht ganz: ${g.n} von 4 Aussagen richtig behandelt`}` +
+    h += `<div class="verdict ${g.full ? 'ok' : 'bad'}">${g.full ? 'Vollständig richtig' : `Nicht ganz: ${g.n} von 4 Aussagen richtig behandelt`} · ${g.pts} von 4 Punkten` +
       `${q.m.includes('UNSICHER') ? ' (unter Vorbehalt)' : ''}</div>`;
     h += `<div class="legend">Schlüssel: ${q.k} · Deine Kreuze: ${a || 'keine'}</div>`;
     h += `<div class="topic">Thema: ${esc(q.t)}</div>`;
@@ -292,7 +295,7 @@ function resultList(run, withDetail) {
     const cls = g.full ? (uns ? 'warn' : 'ok') : 'bad';
     let h = `<button class="row" data-act="toggle" data-id="${id}"><span class="dot ${cls}"></span><span class="main">` +
       `<span class="t">${q.y} · Frage ${q.n} · ${FACH[q.f]}</span><span class="d">${esc(q.t)}</span></span>` +
-      `<span class="v">${g.n}/4</span></button>`;
+      `<span class="v">${g.pts} P.</span></button>`;
     if (withDetail && openDetail === id) {
       h += `<div class="detail"><p>${esc(q.q)}</p><ul>` + LETTERS.map((L, i) => {
         const inKey = q.k.includes(L), picked = a.includes(L);
@@ -305,10 +308,12 @@ function resultList(run, withDetail) {
 
 function summaryView(run, fromHist) {
   const s = runStats(run);
-  const pct = s.answered ? Math.round(100 * s.stm / (4 * s.answered)) : 0;
+  const pct = s.max ? Math.round(100 * s.pts / s.max) : 0;
+  const need = Math.ceil(PASS * s.max);
   let h = fromHist ? `<div class="qtop"><div class="line"><button class="back" data-act="gohist">‹ Versuche</button><span></span></div></div>` : '';
-  h += `<div class="big">${s.full}<small> / ${s.answered}</small></div>`;
-  h += `<p class="sub">vollständig richtig · ${pct} % der Aussagen richtig behandelt` +
+  h += `<div class="big">${s.pts}<small> / ${s.max} Punkte</small></div>`;
+  h += `<div class="pass ${s.pass ? 'ok' : 'bad'}">${s.pass ? 'Bestanden' : 'Nicht bestanden'} · ${pct} %</div>`;
+  h += `<p class="sub">Bestanden ab 60 % (${need} Punkte) · ${s.full} von ${s.answered} Fragen vollständig richtig` +
     (s.answered < s.total ? ` · ${s.total - s.answered} Fragen nicht beantwortet` : '') + `</p>`;
   h += `<div class="list"><div class="row"><span class="main"><span class="t">${esc(run.title)}</span>` +
     `<span class="d">${fmtDate(run.start)}</span></span></div></div>`;
@@ -342,7 +347,8 @@ function histView() {
   if (!DB.done.length) return h + `<div class="list"><div class="empty">Noch keine abgeschlossenen Versuche.</div></div>`;
   h += `<div class="list">` + DB.done.slice().reverse().map(r => {
     const s = runStats(r);
-    return row('openrun', esc(r.title), fmtDate(r.start), `${s.full}/${s.answered}`, `data-run="${r.id}"`);
+    const pc = s.max ? Math.round(100 * s.pts / s.max) : 0;
+    return row('openrun', esc(r.title), `${fmtDate(r.start)} · ${s.pts}/${s.max} Punkte`, `<span class="${s.pass ? 'okc' : 'badc'}">${pc} %</span>`, `data-run="${r.id}"`);
   }).join('') + `</div>`;
   return h;
 }

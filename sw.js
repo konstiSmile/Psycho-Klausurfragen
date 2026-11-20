@@ -1,5 +1,5 @@
-const CACHE = 'psyklausur-v2';
-const FILES = ['./', 'index.html', 'app.css?v=2', 'app.js?v=2', 'data.js?v=2', 'manifest.webmanifest', 'icon-180.png', 'icon-512.png'];
+const CACHE = 'psyklausur-v3';
+const FILES = ['./', 'index.html', 'app.css?v=3', 'app.js?v=3', 'data.js?v=3', 'manifest.webmanifest', 'icon-180.png', 'icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
 });
