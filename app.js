@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '1.9';
+const VERSION = '2.0';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
@@ -238,7 +238,7 @@ function H() {
   const ev = {};
   histRuns().forEach(r => Object.keys(r.ans).forEach(id => {
     if (!BYID[id]) return;
-    (ev[id] = ev[id] || []).push([(r.at && r.at[id]) || r.start, grade(BYID[id], r.ans[id]).full]);
+    { const g = grade(BYID[id], r.ans[id]); (ev[id] = ev[id] || []).push([(r.at && r.at[id]) || r.start, g.full, g.pts]); }
   }));
   const q = {}, days = {};
   let resc = 0;
@@ -256,7 +256,9 @@ function H() {
       prev = full;
     });
     const last = dayNum(dayKey(e[e.length - 1][0]));
-    q[id] = { c, lvl: c === 0 ? 1 : c < 3 ? 2 : 3, due: today >= last + INTERVAL[Math.min(c, 3)], full: prev };
+    const recent = e.slice(-5);
+    const avg = recent.reduce((s, x) => s + x[2], 0) / (4 * recent.length);
+    q[id] = { c, lvl: c === 0 ? 1 : c < 3 ? 2 : 3, due: today >= last + INTERVAL[Math.min(c, 3)], full: prev, n: e.length, avg, lastPts: e[e.length - 1][2] };
   });
   HC = { q, days, resc, today };
   return HC;
@@ -796,15 +798,38 @@ async function applyUpdate() {
   location.replace('./?u=' + Date.now() + '#set');
 }
 
+/* Mosaik als Heatmap: Farbe = Ø-Punkte der letzten 5 Antworten, Krone = gemeistert */
+const CROWN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.5 3 7.5l5 4 4-6.5 4 6.5 5-4-1 10Z"/></svg>';
+let mosSel = null;
+const heat = a => (a < .2 ? 0 : a < .45 ? 1 : a < .65 ? 2 : a < .85 ? 3 : 4);
+function mosInfo(id) {
+  if (!id) return `<span class="mi-hint">Kachel antippen für Details</span>`;
+  const q = BYID[id], x = H().q[id];
+  const st = x ? `${x.n}×\u00a0beantwortet · Ø\u00a0${Math.round(100 * x.avg)}\u00a0%${x.n > 5 ? '\u00a0(letzte\u00a05)' : ''} · zuletzt\u00a0${x.lastPts}/4 · ${LVL[x.lvl]}` : 'Noch nicht beantwortet';
+  return `<span class="mi-t"><b>${q.y} · Frage ${q.n}</b> · ${esc(st)}</span><button class="mi-go" data-act="one" data-id="${id}">Üben ›</button>`;
+}
 function mosaic() {
   let h = `<div class="mosaic">`;
   Object.keys(FACH).forEach(f => {
     const ids = ofFach(f);
     const m = ids.filter(id => lvl(id) === 3).length;
     h += `<div class="mblock"><div class="mh"><span>${FACH[f]}</span><span>${m} / 36 gemeistert</span></div><div class="mgrid">` +
-      ids.map(id => `<i class="l${lvl(id)}" title="${BYID[id].y} · Frage ${BYID[id].n}: ${LVL[lvl(id)]}"></i>`).join('') + `</div></div>`;
+      ids.map(id => {
+        const x = H().q[id];
+        return `<i data-q="${id}" class="${x ? 'h' + heat(x.avg) : ''}${mosSel === id ? ' sel' : ''}">${x && x.lvl === 3 ? CROWN : ''}</i>`;
+      }).join('') + `</div></div>`;
   });
-  return h + `<div class="mlegend">` + LVL.map((n, i) => `<span><i class="l${i}"></i>${n}</span>`).join('') + `</div></div>`;
+  h += `<div class="minfo" data-minfo>${mosInfo(mosSel)}</div>`;
+  return h + `<div class="mlegend"><span><i></i>Neu</span><span class="scale">0 %<i class="h0"></i><i class="h1"></i><i class="h2"></i><i class="h3"></i><i class="h4"></i>100 %</span>` +
+    `<span><i class="h4 crown">${CROWN}</i>Gemeistert</span></div></div>`;
+}
+function selectTile(id) {
+  mosSel = id;
+  view.querySelectorAll('.mgrid i.sel').forEach(e => e.classList.remove('sel'));
+  const t = view.querySelector(`.mgrid i[data-q="${id}"]`);
+  if (t) t.classList.add('sel');
+  const inf = view.querySelector('[data-minfo]');
+  if (inf) inf.innerHTML = mosInfo(id);
 }
 
 function histView() {
@@ -816,7 +841,7 @@ function histView() {
     return `<div class="stat"><b>${ok}<span> / 36</span></b><span>${FACH[f]}</span></div>`;
   }).join('') + `</div><p class="foot">Zuletzt vollständig richtig beantwortet, je Bereich.</p>`;
   h += `<div class="label">Fortschritt je Frage</div>` + mosaic();
-  h += `<p class="foot">Gemeistert heißt: an drei verschiedenen Tagen richtig, ohne Fehler dazwischen. Ein Fehler setzt die Frage auf „gesehen“ zurück.</p>`;
+  h += `<p class="foot">Farbe: Durchschnitt deiner letzten 5 Antworten (0, 2 oder 4 Punkte). Krone: an drei verschiedenen Tagen richtig, ohne Fehler dazwischen.</p>`;
   const open = Object.values(DB.open);
   if (open.length) {
     h += `<div class="label">Noch offen</div><div class="list">` + open.map(r => {
@@ -930,6 +955,10 @@ view.addEventListener('change', e => {
   if (e.target.dataset.in === 'import' && e.target.files[0]) { importFile(e.target.files[0]); e.target.value = ''; }
 });
 
+view.addEventListener('mouseover', e => {
+  const tile = e.target.closest && e.target.closest('.mgrid i[data-q]');
+  if (tile && matchMedia('(hover: hover)').matches && tile.dataset.q !== mosSel) selectTile(tile.dataset.q);
+});
 view.addEventListener('input', e => {
   if (e.target.dataset.in === 'code') codeDraft = e.target.value;
 });
@@ -938,6 +967,8 @@ view.addEventListener('keydown', e => {
 });
 
 view.addEventListener('click', e => {
+  const tile = e.target.closest('.mgrid i[data-q]');
+  if (tile) { selectTile(tile.dataset.q); return; }
   const el = e.target.closest('[data-act]');
   if (!el || el.disabled) return;
   const act = el.dataset.act, tab = el.dataset.tab;
@@ -1011,6 +1042,11 @@ view.addEventListener('click', e => {
     }
     case 'toggle': openDetail = openDetail === el.dataset.id ? null : el.dataset.id; render(); break;
     case 'gohist': go('#hist'); break;
+    case 'one': {
+      const q = BYID[el.dataset.id];
+      if (q) startRun(q.f, `Einzelfrage · ${q.y} · Frage ${q.n}`, [q.id]);
+      break;
+    }
     case 'settings': openSettings(); break;
     case 'setback': go('#' + setFrom); break;
     case 'goal': DB.set.goal = +el.dataset.g; DB.set._t = Date.now(); save(); render(); break;
