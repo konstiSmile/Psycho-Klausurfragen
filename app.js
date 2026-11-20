@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '1.4';
+const VERSION = '1.5';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
@@ -18,21 +18,19 @@ const ICON = {
   diag: '<path d="M4 20h16"/><path d="M7 16v-4"/><path d="M12 16V7"/><path d="M17 16v-7"/>',
   mix: '<path d="M4 7h3.5c4 0 5 10 9 10H20"/><path d="M4 17h3.5c1.6 0 2.7-1.6 3.6-3.5"/><path d="M13 10.5c.9-1.9 2-3.5 3.5-3.5H20"/><path d="m17.5 4.5 2.5 2.5-2.5 2.5"/><path d="m17.5 14.5 2.5 2.5-2.5 2.5"/>',
   hist: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
-  set: '<circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M6 18l1.4-1.4M16.6 7.4 18 6"/>',
+  grp: '<path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H11v15H6.5A1.5 1.5 0 0 1 5 17.5Z"/><path d="M13 4h4.5A1.5 1.5 0 0 1 19 5.5v12a1.5 1.5 0 0 1-1.5 1.5H13Z"/><path d="M7.5 8h1.5M15.5 8H17M15.5 11H17"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>',
 };
-const COLOR = { pers: 'c-blue', entw: 'c-green', diag: 'c-orange', mix: 'c-purple', hist: 'c-gray', set: 'c-gray' };
-const SUBT = { pers: 'Traits, Paradigmen, Faktorenanalyse', entw: 'Kognition, Jugendalter, Selbstkonzept', diag: 'Gütekriterien, Normen, Testtheorie', mix: 'Probeklausur und Originalklausuren', hist: 'Ergebnisse und Wiederholung', set: 'Darstellung und Updates' };
-const SHORT = { pers: 'Persönl.', entw: 'Entwickl.', set: 'Optionen' };
-const TABS = [
-  ['pers', 'Persönlichkeit'], ['entw', 'Entwicklung'], ['diag', 'Diagnostik'],
-  ['mix', 'Gemischt'], ['hist', 'Versuche'], ['set', 'Einstellungen'],
-];
+const SHORT = { pers: 'Persönl.', entw: 'Entwickl.' };
+/* Reiter in Wischreihenfolge; die drei Bereiche teilen sich unten einen Punkt, bis man drin ist */
+const TABS = [['pers', 'Persönlichkeit'], ['entw', 'Entwicklung'], ['diag', 'Diagnostik'], ['mix', 'Gemischt'], ['hist', 'Versuche']];
+const ORDER = TABS.map(t => t[0]);
 
 const BYID = {};
 QUESTIONS.forEach(q => { BYID[q.id] = q; });
 
 /* ---------- Speicher ---------- */
-function blank() { return { v: 1, open: {}, done: [], set: { theme: 'system' } }; }
+function blank() { return { v: 1, open: {}, done: [], set: { theme: 'system', fach: 'pers' } }; }
 function load() {
   try {
     const d = JSON.parse(localStorage.getItem(KEY));
@@ -122,45 +120,32 @@ let pick = new Set();
 let openDetail = null;
 let delArmed = false;
 
+/* Tab-Leiste: einmal aufbauen, danach nur Klassen und Hinterlegung umstellen (damit es gleitet) */
+function buildTabs() {
+  tabsEl.innerHTML = `<div class="pill"><span class="glow"></span>` +
+    `<a href="#${DB.set.fach || 'pers'}" class="grp" data-t="grp"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON.grp}</svg><span>Bereiche</span></a>` +
+    TABS.map(([id, name]) => `<a href="#${id}" data-t="${id}" class="${FACH[id] ? 'f' : ''}">` +
+      `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg><span>${SHORT[id] || name}</span></a>`).join('') + `</div>`;
+}
 function renderTabs(active) {
-  const i = TABS.findIndex(t => t[0] === active);
-  tabsEl.innerHTML = `<div class="pill"><span class="glow" data-i="${i}"></span>` + TABS.map(([id, name]) =>
-    `<a href="#${id}" class="${id === active ? 'on' : ''}" ${id === active ? 'aria-current="page"' : ''}>` +
-    `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg><span>${SHORT[id] || name}</span></a>`).join('') + `</div>`;  const g = tabsEl.querySelector('.glow');
-  const from = lastTab >= 0 ? lastTab : i;
-  g.style.transform = `translateX(${from * 100}%)`;
-  if (from !== i) requestAnimationFrame(() => requestAnimationFrame(() => { g.style.transform = `translateX(${i * 100}%)`; }));
-  lastTab = i;
-}
-let lastTab = -1;
-const HOME = '<button class="homebtn" data-act="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>Übersicht</button>';
-
-function landingView() {
-  const last = lastStatus();
-  const total = QUESTIONS.filter(q => last[q.id] && last[q.id].full).length;
-  let h = `<header class="hero"><div class="eyebrow">Psychologie II · 2020–2022</div><h1 class="xl">Altklausuren</h1>` +
-    `<p class="sub">${total} von 108 Fragen zuletzt vollständig richtig</p><div class="bar big-bar"><i data-w="${Math.round(100 * total / 108)}"></i></div></header>`;
-  h += `<div class="cards">`;
-  TABS.forEach(([id, name], k) => {
-    let meta = '', pct = null;
-    if (FACH[id]) {
-      const ok = ofFach(id).filter(x => last[x] && last[x].full).length;
-      meta = `${ok} von 36 richtig`; pct = Math.round(100 * ok / 36);
-    } else if (id === 'mix') {
-      meta = '108 Fragen';
-    } else if (id === 'hist') {
-      meta = DB.done.length === 1 ? '1 Versuch' : `${DB.done.length} Versuche`;
-    } else {
-      meta = `${THEMES[DB.set.theme]} · Version ${VERSION}`;
-    }
-    const open = DB.open[id] ? `<span class="badge">Läuft · ${runStats(DB.open[id]).answered}/${DB.open[id].ids.length}</span>` : '';
-    h += `<a class="card ${COLOR[id]}" href="#${id}" data-k="${k}"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg></span>` +
-      `<span class="ct"><span class="cn">${name}</span><span class="cs">${SUBT[id]}</span>` +
-      `<span class="cm">${meta}${open}</span>` + (pct !== null ? `<span class="bar"><i data-w="${pct}"></i></span>` : '') +
-      `</span><span class="chev">›</span></a>`;
+  if (!tabsEl.firstChild) buildTabs();
+  const pill = tabsEl.firstChild;
+  const open = !!FACH[active];
+  pill.classList.toggle('open', open);
+  pill.querySelector('.grp').setAttribute('href', '#' + (DB.set.fach || 'pers'));
+  pill.querySelectorAll('a[data-t]').forEach(a => {
+    const on = a.dataset.t === active;
+    a.classList.toggle('on', on);
+    if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    a.tabIndex = (a.classList.contains('f') && !open) || (a.dataset.t === 'grp' && open) ? -1 : 0;
   });
-  return h + `</div><p class="foot center">Version ${VERSION} · Daten nur auf diesem Gerät</p>`;
+  const vis = open ? ORDER : ['grp', 'mix', 'hist'];
+  const i = vis.indexOf(active), n = vis.length;
+  const g = pill.querySelector('.glow');
+  g.style.width = `calc((100% - 10px) / ${n})`;
+  g.style.left = `calc(5px + (100% - 10px) * ${i} / ${n})`;
 }
+const gearBtn = () => `<div class="topbar"><span></span><button class="gear" data-act="settings" aria-label="Einstellungen"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON.gear}</svg></button></div>`;
 
 function row(act, t, d, v, attrs = '') {
   return `<button class="row" data-act="${act}" ${attrs}><span class="main"><span class="t">${t}</span>` +
@@ -188,7 +173,7 @@ function fachView(f) {
   const seen = ids.filter(id => last[id]);
   const ok = seen.filter(id => last[id].full).length;
   const wrong = seen.length - ok;
-  let h = HOME + `<h1>${FACH[f]}</h1><p class="sub">36 Fragen aus den Klausuren 2020–2022 · 1–4 Antworten richtig</p>`;
+  let h = gearBtn() + `<h1>${FACH[f]}</h1><p class="sub">36 Fragen aus den Klausuren 2020–2022 · 1–4 Antworten richtig</p>`;
   h += resumeCard(f);
   h += `<div class="label">Abfragen</div><div class="list">`;
   h += row('start', 'Alle 36 Fragen', 'Reihenfolge wie in den Klausuren', '', `data-tab="${f}" data-kind="all"`);
@@ -207,7 +192,8 @@ function fachView(f) {
 function mixView() {
   const last = lastStatus();
   const wrong = QUESTIONS.filter(q => last[q.id] && !last[q.id].full).length;
-  let h = HOME + `<h1>Gemischt</h1><p class="sub">Alle drei Bereiche · 108 Fragen</p>`;
+  const ok = QUESTIONS.filter(q => last[q.id] && last[q.id].full).length;
+  let h = gearBtn() + `<h1>Gemischt</h1><p class="sub">Alle drei Bereiche · ${ok} von 108 zuletzt vollständig richtig</p>`;
   h += resumeCard('mix');
   h += `<div class="label">Abfragen</div><div class="list">`;
   h += row('start', 'Probeklausur', '36 Fragen, je 12 pro Bereich, zufällig', '', 'data-tab="mix" data-kind="probe"');
@@ -340,7 +326,7 @@ function newer(a, b) {
   return false;
 }
 function setView() {
-  let h = HOME + `<h1>Einstellungen</h1><p class="sub">Darstellung und App-Version</p>`;
+  let h = `<div class="topbar"><button class="back" data-act="setback"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>Zurück</button><span></span></div><h1>Einstellungen</h1><p class="sub">Darstellung und App-Version</p>`;
   h += `<div class="label">Darstellung</div><div class="list"><div class="seg" role="radiogroup">` +
     Object.keys(THEMES).map(t => `<button data-act="theme" data-t="${t}" role="radio" aria-checked="${DB.set.theme === t}" class="${DB.set.theme === t ? 'on' : ''}">${t === 'system' ? 'System' : THEMES[t]}</button>`).join('') +
     `</div></div><p class="foot">„System“ folgt der Einstellung deines iPhones.</p>`;
@@ -352,7 +338,7 @@ function setView() {
   if (upd.st === 'new') h += `<button class="row accent" data-act="updapply"><span class="main"><span class="t">Jetzt aktualisieren</span><span class="d">Lädt die neue Version. Dein Fortschritt bleibt erhalten.</span></span></button>`;
   h += `</div>`;
   if (upd.at) h += `<p class="foot">Zuletzt geprüft: ${fmtDate(upd.at)}</p>`;
-  h += `<p class="foot">Alle Ergebnisse bleiben nur auf diesem Gerät gespeichert.</p>`;
+  h += `<p class="foot">Version ${VERSION} · Alle Ergebnisse bleiben nur auf diesem Gerät gespeichert.</p>`;
   return h;
 }
 async function checkUpdate() {
@@ -379,7 +365,7 @@ async function applyUpdate() {
 
 function histView() {
   const last = lastStatus();
-  let h = HOME + `<h1>Versuche</h1><p class="sub">Abgeschlossene Abfragen, neueste zuerst</p>`;
+  let h = gearBtn() + `<h1>Versuche</h1><p class="sub">Abgeschlossene Abfragen, neueste zuerst</p>`;
   h += `<div class="stats">` + Object.keys(FACH).map(f => {
     const ids = ofFach(f);
     const ok = ids.filter(id => last[id] && last[id].full).length;
@@ -406,19 +392,10 @@ function histView() {
 function go(hash) {
   if (location.hash === hash) render(); else location.hash = hash;
 }
-let prevHome = false;
+let prevTab = null, first = true, setFrom = 'mix';
 function render() {
-  const hash = location.hash.slice(1) || 'home';
-  if (hash === 'home') {
-    document.body.classList.add('home');
-    document.body.classList.remove('quiz', 'enter');
-    tabsEl.innerHTML = '';
-    view.innerHTML = landingView();
-    view.querySelectorAll('[data-w]').forEach(e => { e.style.width = e.dataset.w + '%'; });
-    prevHome = true;
-    return;
-  }
-  document.body.classList.remove('home');
+  let hash = location.hash.slice(1) || 'mix';
+  if (hash === 'home') hash = 'mix';
   const [a, b] = hash.split('/');
   let html = null, tab = a, quiz = false;
   if (a === 'quiz' && DB.open[b]) { html = quizView(b); tab = b; quiz = true; }
@@ -426,15 +403,27 @@ function render() {
     const r = DB.done.find(x => x.id === b);
     if (r) { html = summaryView(r, a === 'run'); tab = a === 'run' ? 'hist' : r.tab; quiz = a === 'sum'; }
   }
+  const isSet = a === 'set' && html === null;
   if (html === null) {
     if (a === 'quiz') tab = b;
-    if (!TABS.some(t => t[0] === tab)) tab = 'pers';
-    html = tab === 'set' ? setView() : tab === 'hist' ? histView() : tab === 'mix' ? mixView() : fachView(tab);
+    if (isSet) tab = 'set';
+    else if (!ORDER.includes(tab)) tab = 'mix';
+    html = isSet ? setView() : tab === 'hist' ? histView() : tab === 'mix' ? mixView() : fachView(tab);
   }
+  if (FACH[tab] && !quiz && DB.set.fach !== tab) { DB.set.fach = tab; save(); }
+  /* Farbhauch: Einstellungen behalten den Hauch der Seite, von der man kommt */
+  document.documentElement.dataset.tab = isSet ? setFrom : tab;
   document.body.classList.toggle('quiz', quiz);
-  document.body.classList.toggle('enter', prevHome && !quiz);
-  prevHome = false;
-  renderTabs(tab);
+  document.body.classList.toggle('set', isSet);
+  document.body.classList.toggle('enter', first);
+  /* Richtung beim Reiterwechsel: Inhalt gleitet von der Seite herein */
+  view.classList.remove('sl', 'sr');
+  const pi = ORDER.indexOf(prevTab), ni = ORDER.indexOf(tab);
+  const plain = !quiz && !isSet && a === tab;
+  if (plain && pi >= 0 && ni >= 0 && pi !== ni && !first) { void view.offsetWidth; view.classList.add(ni > pi ? 'sl' : 'sr'); }
+  prevTab = plain ? tab : null;
+  first = false;
+  if (!isSet) renderTabs(tab);
   view.innerHTML = html;
   view.querySelectorAll('[data-w]').forEach(e => { e.style.width = e.dataset.w + '%'; });
 }
@@ -496,7 +485,8 @@ view.addEventListener('click', e => {
     }
     case 'toggle': openDetail = openDetail === el.dataset.id ? null : el.dataset.id; render(); break;
     case 'gohist': go('#hist'); break;
-    case 'home': go('#home'); break;
+    case 'settings': setFrom = ORDER.includes(prevTab) ? prevTab : 'mix'; upd.st = upd.st === 'checking' ? upd.st : 'idle'; go('#set'); break;
+    case 'setback': go('#' + setFrom); break;
     case 'theme': DB.set.theme = el.dataset.t; save(); applyTheme(DB.set.theme); render(); break;
     case 'updcheck': checkUpdate(); break;
     case 'updapply': applyUpdate(); break;
@@ -519,6 +509,26 @@ view.addEventListener('click', e => {
 
 render();
 lastHash = location.hash;
+
+/* Wischen zwischen den Reitern (nicht in Prüfungen und Einstellungen) */
+let sw = null;
+document.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1 || document.body.classList.contains('quiz') || document.body.classList.contains('set')) { sw = null; return; }
+  const t = e.touches[0];
+  if (t.clientX < 22 || t.clientX > window.innerWidth - 22) { sw = null; return; }
+  sw = { x: t.clientX, y: t.clientY, t: Date.now() };
+}, { passive: true });
+document.addEventListener('touchend', e => {
+  if (!sw) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - sw.x, dy = t.clientY - sw.y, dt = Date.now() - sw.t;
+  sw = null;
+  if (Math.abs(dx) < 60 || Math.abs(dx) < 1.6 * Math.abs(dy) || dt > 700) return;
+  const cur = ORDER.indexOf(prevTab);
+  if (cur < 0) return;
+  const nx = cur + (dx < 0 ? 1 : -1);
+  if (nx >= 0 && nx < ORDER.length) go('#' + ORDER[nx]);
+}, { passive: true });
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
