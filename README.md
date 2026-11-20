@@ -5,4 +5,4 @@ Reine Web-App ohne Bibliotheken, Daten nur lokal im Browser (Schlüssel `psyklau
 
 - `quelle/katalog.md` – Fragenkatalog (Quelle)
 - `data.js` – daraus erzeugt (`python3 quelle/parse.py quelle/katalog.md data.js`)
-- Bei jeder Änderung `CACHE` in `sw.js` und `?v=` in `index.html`/`sw.js` erhöhen.
+- Bei jeder Änderung `CACHE` in `sw.js`, `?v=` in `index.html`/`sw.js`, `VERSION` in `app.js` und `version.json` erhöhen (Update-Suche vergleicht `version.json` mit `VERSION`).

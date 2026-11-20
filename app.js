@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '1.3';
+const VERSION = '1.4';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
@@ -18,23 +18,25 @@ const ICON = {
   diag: '<path d="M4 20h16"/><path d="M7 16v-4"/><path d="M12 16V7"/><path d="M17 16v-7"/>',
   mix: '<path d="M4 7h3.5c4 0 5 10 9 10H20"/><path d="M4 17h3.5c1.6 0 2.7-1.6 3.6-3.5"/><path d="M13 10.5c.9-1.9 2-3.5 3.5-3.5H20"/><path d="m17.5 4.5 2.5 2.5-2.5 2.5"/><path d="m17.5 14.5 2.5 2.5-2.5 2.5"/>',
   hist: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  set: '<circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M6 18l1.4-1.4M16.6 7.4 18 6"/>',
 };
-const COLOR = { pers: 'c-blue', entw: 'c-green', diag: 'c-orange', mix: 'c-purple', hist: 'c-gray' };
-const SUBT = { pers: 'Traits, Paradigmen, Faktorenanalyse', entw: 'Kognition, Jugendalter, Selbstkonzept', diag: 'Gütekriterien, Normen, Testtheorie', mix: 'Probeklausur und Originalklausuren', hist: 'Ergebnisse und Wiederholung' };
+const COLOR = { pers: 'c-blue', entw: 'c-green', diag: 'c-orange', mix: 'c-purple', hist: 'c-gray', set: 'c-gray' };
+const SUBT = { pers: 'Traits, Paradigmen, Faktorenanalyse', entw: 'Kognition, Jugendalter, Selbstkonzept', diag: 'Gütekriterien, Normen, Testtheorie', mix: 'Probeklausur und Originalklausuren', hist: 'Ergebnisse und Wiederholung', set: 'Darstellung und Updates' };
+const SHORT = { pers: 'Persönl.', entw: 'Entwickl.', set: 'Optionen' };
 const TABS = [
   ['pers', 'Persönlichkeit'], ['entw', 'Entwicklung'], ['diag', 'Diagnostik'],
-  ['mix', 'Gemischt'], ['hist', 'Versuche'],
+  ['mix', 'Gemischt'], ['hist', 'Versuche'], ['set', 'Einstellungen'],
 ];
 
 const BYID = {};
 QUESTIONS.forEach(q => { BYID[q.id] = q; });
 
 /* ---------- Speicher ---------- */
-function blank() { return { v: 1, open: {}, done: [] }; }
+function blank() { return { v: 1, open: {}, done: [], set: { theme: 'system' } }; }
 function load() {
   try {
     const d = JSON.parse(localStorage.getItem(KEY));
-    if (d && d.v === 1 && d.open && Array.isArray(d.done)) return d;
+    if (d && d.v === 1 && d.open && Array.isArray(d.done)) { d.set = d.set || { theme: 'system' }; return d; }
   } catch (e) { /* leer */ }
   return blank();
 }
@@ -124,7 +126,7 @@ function renderTabs(active) {
   const i = TABS.findIndex(t => t[0] === active);
   tabsEl.innerHTML = `<div class="pill"><span class="glow" data-i="${i}"></span>` + TABS.map(([id, name]) =>
     `<a href="#${id}" class="${id === active ? 'on' : ''}" ${id === active ? 'aria-current="page"' : ''}>` +
-    `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg><span>${name}</span></a>`).join('') + `</div>`;  const g = tabsEl.querySelector('.glow');
+    `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg><span>${SHORT[id] || name}</span></a>`).join('') + `</div>`;  const g = tabsEl.querySelector('.glow');
   const from = lastTab >= 0 ? lastTab : i;
   g.style.transform = `translateX(${from * 100}%)`;
   if (from !== i) requestAnimationFrame(() => requestAnimationFrame(() => { g.style.transform = `translateX(${i * 100}%)`; }));
@@ -146,8 +148,10 @@ function landingView() {
       meta = `${ok} von 36 richtig`; pct = Math.round(100 * ok / 36);
     } else if (id === 'mix') {
       meta = '108 Fragen';
-    } else {
+    } else if (id === 'hist') {
       meta = DB.done.length === 1 ? '1 Versuch' : `${DB.done.length} Versuche`;
+    } else {
+      meta = `${THEMES[DB.set.theme]} · Version ${VERSION}`;
     }
     const open = DB.open[id] ? `<span class="badge">Läuft · ${runStats(DB.open[id]).answered}/${DB.open[id].ids.length}</span>` : '';
     h += `<a class="card ${COLOR[id]}" href="#${id}" data-k="${k}"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg></span>` +
@@ -328,6 +332,51 @@ function summaryView(run, fromHist) {
   return h;
 }
 
+const THEMES = { system: 'Wie System', light: 'Hell', dark: 'Dunkel' };
+let upd = { st: 'idle', remote: null, at: null };
+function newer(a, b) {
+  const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number);
+  for (let i = 0; i < Math.max(x.length, y.length); i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); }
+  return false;
+}
+function setView() {
+  let h = HOME + `<h1>Einstellungen</h1><p class="sub">Darstellung und App-Version</p>`;
+  h += `<div class="label">Darstellung</div><div class="list"><div class="seg" role="radiogroup">` +
+    Object.keys(THEMES).map(t => `<button data-act="theme" data-t="${t}" role="radio" aria-checked="${DB.set.theme === t}" class="${DB.set.theme === t ? 'on' : ''}">${t === 'system' ? 'System' : THEMES[t]}</button>`).join('') +
+    `</div></div><p class="foot">„System“ folgt der Einstellung deines iPhones.</p>`;
+  const stTxt = { idle: '', checking: 'Suche …', current: 'Aktuell', offline: 'Keine Verbindung', new: `Version ${upd.remote} verfügbar` }[upd.st];
+  const stCls = upd.st === 'current' ? 'ok' : upd.st === 'new' ? 'new' : '';
+  h += `<div class="label">App</div><div class="list">`;
+  h += `<div class="row"><span class="main"><span class="t">Version</span></span><span class="v">${VERSION}</span></div>`;
+  h += `<button class="row accent" data-act="updcheck" ${upd.st === 'checking' ? 'disabled' : ''}><span class="main"><span class="t">Nach Updates suchen</span></span><span class="v ${stCls}">${stTxt}</span></button>`;
+  if (upd.st === 'new') h += `<button class="row accent" data-act="updapply"><span class="main"><span class="t">Jetzt aktualisieren</span><span class="d">Lädt die neue Version. Dein Fortschritt bleibt erhalten.</span></span></button>`;
+  h += `</div>`;
+  if (upd.at) h += `<p class="foot">Zuletzt geprüft: ${fmtDate(upd.at)}</p>`;
+  h += `<p class="foot">Alle Ergebnisse bleiben nur auf diesem Gerät gespeichert.</p>`;
+  return h;
+}
+async function checkUpdate() {
+  upd = { st: 'checking', remote: null, at: upd.at };
+  render();
+  try {
+    const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
+    const j = await r.json();
+    upd = { st: newer(j.version, VERSION) ? 'new' : 'current', remote: j.version, at: Date.now() };
+  } catch (e) {
+    upd = { st: 'offline', remote: null, at: upd.at };
+  }
+  if ((location.hash.slice(1) || 'home') === 'set') render();
+}
+async function applyUpdate() {
+  try {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k.startsWith('psyklausur-')).map(k => caches.delete(k)));
+    const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+    if (reg) await reg.update();
+  } catch (e) { /* trotzdem neu laden */ }
+  location.replace('./?u=' + Date.now() + '#set');
+}
+
 function histView() {
   const last = lastStatus();
   let h = HOME + `<h1>Versuche</h1><p class="sub">Abgeschlossene Abfragen, neueste zuerst</p>`;
@@ -380,7 +429,7 @@ function render() {
   if (html === null) {
     if (a === 'quiz') tab = b;
     if (!TABS.some(t => t[0] === tab)) tab = 'pers';
-    html = tab === 'hist' ? histView() : tab === 'mix' ? mixView() : fachView(tab);
+    html = tab === 'set' ? setView() : tab === 'hist' ? histView() : tab === 'mix' ? mixView() : fachView(tab);
   }
   document.body.classList.toggle('quiz', quiz);
   document.body.classList.toggle('enter', prevHome && !quiz);
@@ -391,9 +440,14 @@ function render() {
 }
 
 let lastHash = '';
+let navT = 0;
 window.addEventListener('hashchange', () => {
   const h = location.hash;
-  if (h !== lastHash) { openDetail = null; delArmed = false; pick = new Set(); window.scrollTo(0, 0); }
+  if (h !== lastHash) {
+    openDetail = null; delArmed = false; pick = new Set(); window.scrollTo(0, 0);
+    document.body.classList.add('nav');
+    clearTimeout(navT); navT = setTimeout(() => document.body.classList.remove('nav'), 450);
+  }
   lastHash = h;
   render();
 });
@@ -443,6 +497,9 @@ view.addEventListener('click', e => {
     case 'toggle': openDetail = openDetail === el.dataset.id ? null : el.dataset.id; render(); break;
     case 'gohist': go('#hist'); break;
     case 'home': go('#home'); break;
+    case 'theme': DB.set.theme = el.dataset.t; save(); applyTheme(DB.set.theme); render(); break;
+    case 'updcheck': checkUpdate(); break;
+    case 'updapply': applyUpdate(); break;
     case 'openrun': go('#run/' + el.dataset.run); break;
     case 'retry': {
       const run = DB.done.find(x => x.id === el.dataset.run);

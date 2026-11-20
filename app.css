@@ -27,10 +27,9 @@
   --fadeB: rgba(247, 245, 240, .75);
   --shadow: rgba(31, 42, 68, .14);
   --serif: ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif;
-  color-scheme: light dark;
+  color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
+:root[data-theme="dark"] {
     /* Design 3 · Nacht: warmes Tintenschwarz, Papierweiß als Schrift */
     --bg: #15161a;
     --card: #1d1f24;
@@ -58,6 +57,38 @@
     --fadeA: rgba(21, 22, 26, 0);
     --fadeB: rgba(21, 22, 26, .78);
     --shadow: rgba(0, 0, 0, .45);
+    color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    /* Design 3 · Nacht: warmes Tintenschwarz, Papierweiß als Schrift */
+    --bg: #15161a;
+    --card: #1d1f24;
+    --card2: #292b31;
+    --sep: #2c2e35;
+    --line: #2c2e35;
+    --text: #ebe6dc;
+    --muted: #9b9a9f;
+    --accent: #ebe6dc;
+    --ok: #8fb79b;
+    --bad: #e0907f;
+    --warn: #d6aa62;
+    --okbg: rgba(143, 183, 155, .12);
+    --badbg: rgba(224, 144, 127, .12);
+    --warnbg: rgba(214, 170, 98, .12);
+    --tabbg: rgba(29, 31, 36, .86);
+    --sel: rgba(235, 230, 220, .08);
+    --glass: rgba(33, 35, 41, .72);
+    --glassline: rgba(235, 230, 220, .1);
+    --glow: rgba(235, 230, 220, .09);
+    --ontext: #15161a;
+    --letline: #4b4d55;
+    --okline: rgba(143, 183, 155, .3);
+    --badline: rgba(224, 144, 127, .3);
+    --fadeA: rgba(21, 22, 26, 0);
+    --fadeB: rgba(21, 22, 26, .78);
+    --shadow: rgba(0, 0, 0, .45);
+    color-scheme: dark;
   }
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -253,7 +284,7 @@ body.home #fade { height: calc(env(safe-area-inset-bottom) + 50px); }
 }
 body.quiz #tabs, body.home #tabs { display: none; }
 #tabs .pill {
-  pointer-events: auto; position: relative; display: flex; max-width: 440px; margin: 0 auto;
+  pointer-events: auto; position: relative; display: flex; max-width: 460px; margin: 0 auto;
   padding: 5px; border-radius: 999px;
   background: var(--glass); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
   border: .5px solid var(--glassline);
@@ -262,20 +293,20 @@ body.quiz #tabs, body.home #tabs { display: none; }
 body.enter #tabs .pill { animation: barin .55s cubic-bezier(.2, .9, .25, 1.15) both; }
 @keyframes barin { from { opacity: 0; transform: translateY(40px) scale(.92); } to { opacity: 1; transform: none; } }
 #tabs .glow {
-  position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc((100% - 10px) / 5);
+  position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc((100% - 10px) / 6);
   border-radius: 999px; background: var(--glow);
   transition: transform .38s cubic-bezier(.3, .9, .3, 1.1);
 }
 #tabs a {
   position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px;
-  color: var(--muted); text-decoration: none; font-size: 10px; font-weight: 600; padding: 6px 0 5px; min-width: 0;
+  color: var(--muted); text-decoration: none; font-size: 10px; letter-spacing: -.1px; font-weight: 600; padding: 6px 0 5px; min-width: 0;
 }
 #tabs a span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #tabs a.on { color: var(--accent); }
-#tabs svg { width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+#tabs svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
 /* sanfter Seitenwechsel */
-body:not(.home):not(.quiz) main > h1, body:not(.home):not(.quiz) main > .sub { animation: rise .35s ease both; }
+body.nav:not(.home):not(.quiz) main > h1, body.nav:not(.home):not(.quiz) main > .sub { animation: rise .35s ease both; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
@@ -354,11 +385,25 @@ button.row:active { background: var(--card2); }
 #tabs a.on { color: var(--text); }
 #fade { background: linear-gradient(to bottom, var(--fadeA) 0%, var(--fadeB) 55%, var(--bg) 100%); }
 
+:root[data-theme="dark"] .c-blue { --tint: #93abd8; --tint-bg: rgba(147, 171, 216, .14); }
+:root[data-theme="dark"] .c-green { --tint: #8fb79b; --tint-bg: rgba(143, 183, 155, .14); }
+:root[data-theme="dark"] .c-orange { --tint: #d6aa62; --tint-bg: rgba(214, 170, 98, .14); }
+:root[data-theme="dark"] .c-purple { --tint: #b6a5cc; --tint-bg: rgba(182, 165, 204, .14); }
+:root[data-theme="dark"] .c-gray { --tint: #a7a8ae; --tint-bg: rgba(167, 168, 174, .14); }
+:root[data-theme="dark"] .opt .let.x { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--text); }
 @media (prefers-color-scheme: dark) {
-  .c-blue { --tint: #93abd8; --tint-bg: rgba(147, 171, 216, .14); }
-  .c-green { --tint: #8fb79b; --tint-bg: rgba(143, 183, 155, .14); }
-  .c-orange { --tint: #d6aa62; --tint-bg: rgba(214, 170, 98, .14); }
-  .c-purple { --tint: #b6a5cc; --tint-bg: rgba(182, 165, 204, .14); }
-  .c-gray { --tint: #a7a8ae; --tint-bg: rgba(167, 168, 174, .14); }
-  .opt .let.x { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--text); }
+  :root:not([data-theme="light"]) .c-blue { --tint: #93abd8; --tint-bg: rgba(147, 171, 216, .14); }
+  :root:not([data-theme="light"]) .c-green { --tint: #8fb79b; --tint-bg: rgba(143, 183, 155, .14); }
+  :root:not([data-theme="light"]) .c-orange { --tint: #d6aa62; --tint-bg: rgba(214, 170, 98, .14); }
+  :root:not([data-theme="light"]) .c-purple { --tint: #b6a5cc; --tint-bg: rgba(182, 165, 204, .14); }
+  :root:not([data-theme="light"]) .c-gray { --tint: #a7a8ae; --tint-bg: rgba(167, 168, 174, .14); }
+  :root:not([data-theme="light"]) .opt .let.x { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--text); }
 }
+
+/* Einstellungen */
+.seg { display: flex; background: var(--card2); border-radius: 10px; padding: 3px; gap: 2px; margin: 12px 16px 14px; }
+.seg button { flex: 1; padding: 8px 4px; border-radius: 8px; font-size: 15px; color: var(--muted); }
+.seg button.on { background: var(--card); color: var(--text); font-weight: 600; box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+.row .v.ok { color: var(--ok); }
+.row .v.new { color: var(--warn); font-weight: 600; }
+.setrow { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 0; }
