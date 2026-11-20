@@ -11,9 +11,9 @@ blocks = re.split(r'\n#### ', part4)[1:]
 qs = []
 for b in blocks:
     head, body = b.split('\n', 1)
-    m = re.match(r'\[(\d{4})-(\d{2})\] Klausur \d{4} · Frage (\d+) · (\w+)(?: · Markierungen: (.*))?$', head.strip())
+    m = re.match(r'\[((\d{4})w?)-(\d{2})\] Klausur \S+ · Frage (\d+) · (\w+)(?: · Markierungen: (.*))?$', head.strip())
     assert m, head
-    year, nr, nr2, fach, marks = m.groups()
+    exam, year, nr, nr2, fach, marks = m.groups()
     assert int(nr) == int(nr2)
     q = re.search(r'\*\*Frage:\*\* (.*?)\n\n', body, re.S).group(1).strip()
     opts = {}
@@ -22,7 +22,9 @@ for b in blocks:
         assert mm, (head, L)
         opts[L] = mm.group(1).strip()
     sol = re.search(r'A = (\w+) · B = (\w+) · C = (\w+) · D = (\w+)', body).groups()
+    assert all(s in ('RICHTIG', 'FALSCH', 'NICHT_GEWERTET') for s in sol), head
     key = ''.join(L for L, s in zip('ABCD', sol) if s == 'RICHTIG')
+    void = ''.join(L for L, s in zip('ABCD', sol) if s == 'NICHT_GEWERTET')
     km = re.search(r'\*\*Schlüssel:\*\* (\w+) · \*\*Thema:\*\* (.*)$', body, re.M)
     assert km.group(1) == key, (head, key, km.group(1))
     hints = []
@@ -32,22 +34,24 @@ for b in blocks:
             t, msg = re.match(r'- (\w+): (.*)', line).groups()
             hints.append([t, msg.strip()])
     qs.append({
-        'id': f'{year}-{nr}', 'y': int(year), 'n': int(nr), 'f': FACH[fach],
+        'id': f'{exam}-{nr}', 'e': exam, 'y': int(year), 'n': int(nr), 'f': FACH[fach],
         'q': q, 'o': [opts[L] for L in 'ABCD'], 'k': key, 't': km.group(2).strip(),
         'm': [x.strip() for x in marks.split(',')] if marks else [], 'h': hints,
     })
+    if void:
+        qs[-1]['x'] = void
 
 # Gegenprüfung mit Teil 5
-rows = re.findall(r'^\| (\d{4}-\d{2}) \| (\w+) \| (\w+) \|', table, re.M)
-assert len(rows) == 108 and len(qs) == 108
+rows = re.findall(r'^\| (\d{4}w?-\d{2}) \| (\w+) \| (\w+) \|', table, re.M)
+assert len(rows) == 153 and len(qs) == 153
 byid = {q['id']: q for q in qs}
 for i, fach, key in rows:
     assert byid[i]['k'] == key, (i, key)
     assert byid[i]['f'] == FACH[fach], i
 cnt = [sum(1 for q in qs if len(q['k']) == n) for n in (1, 2, 3, 4)]
-assert cnt == [25, 42, 31, 10], cnt
+assert cnt == [38, 58, 40, 17], cnt
 for f in FACH.values():
-    assert sum(1 for q in qs if q['f'] == f) == 36
+    assert sum(1 for q in qs if q['f'] == f) == 51
 
 open(out, 'w', encoding='utf-8').write(
     '// Automatisch erzeugt aus dem Abfragekatalog. Nicht von Hand ändern.\n'

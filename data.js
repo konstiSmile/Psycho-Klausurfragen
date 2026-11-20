@@ -1,7 +1,830 @@
 // Automatisch erzeugt aus dem Abfragekatalog. Nicht von Hand ändern.
 const QUESTIONS = [
 {
+"id": "2020w-01",
+"e": "2020w",
+"y": 2020,
+"n": 1,
+"f": "pers",
+"q": "Beim idiografischen Forschungsansatz liegt der Schwerpunkt auf...",
+"o": [
+"Komparationsforschung und Korrelationsforschung.",
+"Psychografie und Variationsforschung.",
+"dem Vergleich von Merkmalen.",
+"dem Vergleich von Individuen."
+],
+"k": "D",
+"t": "Idiografischer Ansatz: Vergleich von Individuen",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-02",
+"e": "2020w",
+"y": 2020,
+"n": 2,
+"f": "pers",
+"q": "Welchen Einfluss haben Genom und Umwelt auf die Persönlichkeit?",
+"o": [
+"Eltern haben eine größere genetische Ähnlichkeit mit ihren leiblichen Kindern als Geschwister untereinander.",
+"Der Einfluss geteilter Umwelten ist größer als der nicht geteilter.",
+"Werden die eigenschaftswirksamen Umwelten der Populationsmitglieder homogener, steigt der genetische Einfluss.",
+"Der Einfluss von Genen lässt sich in Kombinationsstudien am besten nachweisen."
+],
+"k": "CD",
+"t": "Anlage und Umwelt (Verhaltensgenetik)",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-03",
+"e": "2020w",
+"y": 2020,
+"n": 3,
+"f": "pers",
+"q": "Ein Psychogramm beschreibt...",
+"o": [
+"vor allem Eigenschaften, die bei einer Person stark ausgeprägt sind.",
+"die Position eines Individuums zwischen zwei Polen bei unterschiedlichen Eigenschaften.",
+"die Durchschnittswerte von Eigenschaften bei einer bestimmten Population.",
+"alle Eigenschaften einer Person."
+],
+"k": "B",
+"t": "Psychogramm",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-04",
+"e": "2020w",
+"y": 2020,
+"n": 4,
+"f": "pers",
+"q": "Wie unterscheiden sich Eysencks und Cattells Persönlichkeitstheorien?",
+"o": [
+"Eysenck entwickelte ein hierarchisches Modell.",
+"Catell ging von einer größeren Anzahl von Faktoren aus.",
+"Cattell beschrieb die Entwicklung von Persönlichkeitseigenschaften.",
+"Cattell vertrat den idiografischen Forschungsansatz, Eysenck den nomothetischen."
+],
+"k": "AB",
+"t": "Eysenck vs. Cattell",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-05",
+"e": "2020w",
+"y": 2020,
+"n": 5,
+"f": "pers",
+"q": "Was ist ein State?",
+"o": [
+"Ein Begriff für über Situationen hinweg variierendes Verhalten.",
+"Eine Disposition.",
+"Das aktuelle Eigenschaftsprofil einer Person.",
+"Ein aktueller Zustand."
+],
+"k": "AD",
+"t": "State vs. Trait",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-06",
+"e": "2020w",
+"y": 2020,
+"n": 6,
+"f": "pers",
+"q": "Bei einer Faktorenanalyse stellen Sie fest, dass ein Item auf zwei Faktoren identisch hohe Ladungen erzeugt. Was können Sie tun?",
+"o": [
+"Ich ersetze das Item und führe die Analyse erneut durch.",
+"Ich entferne das Item aus einem der beiden Faktoren.",
+"Ich lasse das Item in beiden Faktoren.",
+"Ich entferne das Item aus beiden Faktoren."
+],
+"k": "AD",
+"t": "Faktorenanalyse: Doppelladungen",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-07",
+"e": "2020w",
+"y": 2020,
+"n": 7,
+"f": "pers",
+"q": "Was wird im Allgemeinen als \"Naive Persönlichkeitspsychologie\" bezeichnet?",
+"o": [
+"Vorstellungen von Laien, die zur Beschreibung, Erklärung und Vorhersage von individuellen Besonderheiten dienen.",
+"Vorstellungen von Kindern über die Persönlichkeit eines Menschen.",
+"Aus dem alltäglichen Erleben stammende Schussfolgerungen über Persönlichkeitseigenschaften.",
+"Persönlichkeitstheorien über Kinder."
+],
+"k": "AC",
+"t": "Naive Persönlichkeitspsychologie",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-08",
+"e": "2020w",
+"y": 2020,
+"n": 8,
+"f": "pers",
+"q": "Was gilt für den dimensionalen Charakter von Dispositionen?",
+"o": [
+"Jede Eigenschaft hat mindestens drei Dimensionen.",
+"Dispositionen können unterschiedlich stark ausgeprägt sein.",
+"Dispositionen weisen ein Kontinuum auf.",
+"Extreme Ausprägungen sind selten."
+],
+"k": "BCD",
+"t": "Dimensionalität von Dispositionen",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-09",
+"e": "2020w",
+"y": 2020,
+"n": 9,
+"f": "pers",
+"q": "Die Selbstwirksamkeitserwartung bei Schülern...",
+"o": [
+"beschreibt die Überzeugung eines Schülers, dass eine bestimmte Handlung zum Ziel führt.",
+"ist zu Beginn der Schullaufbahn hoch und sinkt ab dem Sekundarschulalter wieder ab.",
+"steigt, wenn Schüler Zielerreichungen external attribuieren.",
+"beschreibt die Überzeugung, eine bestimmte Handlung durchführen zu können."
+],
+"k": "D",
+"t": "Selbstwirksamkeitserwartung",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-10",
+"e": "2020w",
+"y": 2020,
+"n": 10,
+"f": "pers",
+"q": "Mittels einer Korrelation kann man...",
+"o": [
+"Persönlichkeitsprofile aufstellen.",
+"Zusammenhänge zwischen Phänomenen aufdecken.",
+"die Ursachen von Phänomenen entdecken.",
+"Ähnlichkeiten zwischen Personen messen."
+],
+"k": "B",
+"t": "Korrelation: Zusammenhang, keine Kausalität",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-11",
+"e": "2020w",
+"y": 2020,
+"n": 11,
+"f": "pers",
+"q": "Kritiker des dispositionalen Ansatzes bemängeln, dass....",
+"o": [
+"Persönlichkeitsveränderungen zu wenig berücksichtigt werden.",
+"hinter diesem Ansatz kein theoretisches Konzept steht.",
+"situationale Faktoren überschätzt werden.",
+"er keine Verhaltensvorhersagen zulässt."
+],
+"k": "ABD",
+"t": "Kritik am dispositionalen Ansatz",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-12",
+"e": "2020w",
+"y": 2020,
+"n": 12,
+"f": "pers",
+"q": "Die Faktorenanalyse...",
+"o": [
+"hilft bei der Auswahl derjenigen Items, durch die ein Konstrukt erfasst werden kann.",
+"ist ein Verfahren mit dem Konstrukte auf ihre Unabhängigkeit voneinander geprüft werden.",
+"bestimmt die Anzahl von unterschiedlichen Faktoren in einem Itempool.",
+"zeigt, ob verschiedene Items ein ähnliches Konstrukt messen."
+],
+"k": "ABCD",
+"t": "Faktorenanalyse: Zweck",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-13",
+"e": "2020w",
+"y": 2020,
+"n": 13,
+"f": "pers",
+"q": "Nach Freud entstehen Persönlichkeitseigenschaften durch...",
+"o": [
+"elterliches Verhalten.",
+"Lernerfahrungen in der Kindheit.",
+"den Einsatz von unterschiedlichen Abwehrmechanismen.",
+"Fixierungen auf verschiedenen Entwicklungsstufen."
+],
+"k": "ACD",
+"t": "Freud: Entstehung von Persönlichkeitseigenschaften",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-14",
+"e": "2020w",
+"y": 2020,
+"n": 14,
+"f": "pers",
+"q": "Wenn ich die durchschnittliche Prüfungsangst in einer 4. Klasse erfasse, handelt es sich um...",
+"o": [
+"Komparationsforschung.",
+"eine Untersuchung nach dem nomothetischen Ansatz.",
+"Variationsforschung.",
+"die Erfassung eines Traits."
+],
+"k": "BCD",
+"t": "Nomothetischer Ansatz, Variationsforschung",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-15",
+"e": "2020w",
+"y": 2020,
+"n": 15,
+"f": "pers",
+"q": "Traits sollen...",
+"o": [
+"mit anderen Traits korrelieren.",
+"mit States korrelieren.",
+"über ähnliche Situationen hinweg Konsistenz aufweisen.",
+"direkt beobachtbar sein."
+],
+"k": "C",
+"t": "Traits: transsituative Konsistenz",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-16",
+"e": "2020w",
+"y": 2020,
+"n": 16,
+"f": "diag",
+"q": "Der WISC V erfasst...",
+"o": [
+"den Gesamt-IQ.",
+"Arbeitsgedächtnis und visuelle Wahrnehmung.",
+"Sprachverständnis und Motivation.",
+"Fluides Schlussfolgern und Verarbeitungsgeschwindigkeit."
+],
+"k": "AD",
+"t": "WISC-V: Indizes",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-17",
+"e": "2020w",
+"y": 2020,
+"n": 17,
+"f": "diag",
+"q": "Welche Anforderung/en wird/werden an die Konstruktvalidität gestellt?",
+"o": [
+"Der Test soll nicht mit Merkmalen korrelieren, die nicht mit dem Konstrukt verbunden sind.",
+"Ein Test soll hoch mit Merkmalen korrelieren, die nach der Theorie mit dem Konstrukt verbunden sind.",
+"Das Konstrukt muss operationalisierbar sein.",
+"Der Test soll die Facetten, die nach der Theorie mit den Konstrukt verbunden sind, möglichst komplett erfassen."
+],
+"k": "ABCD",
+"t": "Konstruktvalidität (konvergent/divergent)",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-18",
+"e": "2020w",
+"y": 2020,
+"n": 18,
+"f": "diag",
+"q": "Was gilt für die Reliabilität eines Tests?",
+"o": [
+"Ein invalider Test kann sehr reliabel sein.",
+"Reliabilität beschreibt die Differenz zwischen wahrem Wert und Testwert.",
+"Die Stabilität eines Merkmals beeinflusst die Reliabilität eines Tests.",
+"Reliabilität kann nur geschätzt werden."
+],
+"k": "ABCD",
+"t": "Reliabilität",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-19",
+"e": "2020w",
+"y": 2020,
+"n": 19,
+"f": "diag",
+"q": "Worauf sollte man bei den Normwerten eines Tests achten?",
+"o": [
+"Die Normwerte sollten möglichst aktuell sein.",
+"Die Normierungsstichprobe sollte möglichst groß sein.",
+"Die Stichprobe sollte repräsentativ für die Population sein, für die der Test Gültigkeit beansprucht.",
+"Es sollten Normen vorliegen, die den Test mit anderen Tests vergleichbar machen."
+],
+"k": "ABCD",
+"t": "Normierung",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-20",
+"e": "2020w",
+"y": 2020,
+"n": 20,
+"f": "diag",
+"q": "Interpretieren Sie folgenden Befund: Die Korrelation zwischen Prüfungsangst und der Leistung im Sport beträgt r = -.6",
+"o": [
+"Aufgrund von Prüfungsangst haben 49% der Schüler eine schlechtere Sportleistung.",
+"Die Note in Sport wird zu 60% von der Prüfungsangst bestimmt.",
+"36% der Leistungsvarianz im Sport wird durch Prüfungsangst erklärt.",
+"Je besser die Sportleistung, desto niedriger ist die Prüfungsangst."
+],
+"k": "CD",
+"t": "Korrelation interpretieren (r², Richtung)",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-21",
+"e": "2020w",
+"y": 2020,
+"n": 21,
+"f": "diag",
+"q": "Wenn zwei Lehrer dieselbe Mathearbeit unterschiedlich benoten, ist das ein Beispiel für...",
+"o": [
+"mangelnde Konstruktvalidität.",
+"mangelnde Auswertungsobjektivität.",
+"mangelnde Interpretationsobjektivität.",
+"mangelnde Durchführungsobjektivität."
+],
+"k": "BC",
+"t": "Arten der Objektivität",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-22",
+"e": "2020w",
+"y": 2020,
+"n": 22,
+"f": "diag",
+"q": "Welche Aussage/n gilt/gelten für Daten in der empirischen Psychologie?",
+"o": [
+"Nicht alle Formen von Daten sind für Kausalaussagen geeignet.",
+"Daten sind in der Regel normalverteilt.",
+"Daten dienen zur Verifizierung von Theorien.",
+"Daten entstehen durch Beobachtung oder Befragung."
+],
+"k": "ABCD",
+"t": "Daten in der empirischen Psychologie",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-23",
+"e": "2020w",
+"y": 2020,
+"n": 23,
+"f": "diag",
+"q": "Was gilt für den Intelligenzquotienten?",
+"o": [
+"Der Intelligenzwert eines Individuums wird mit dem Mittelwert seiner Altrsgruppe verglichen.",
+"Intelligenzmessungen sind schon bei Dreijährigen stabil.",
+"Die Standardabweichung im IQ-Test beträgt 10 IQ-Punkte.",
+"Der IQ ist im Alter zwischen 20 und 25 in der Regel am höchsten."
+],
+"k": "AD",
+"t": "Intelligenzquotient",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-24",
+"e": "2020w",
+"y": 2020,
+"n": 24,
+"f": "diag",
+"q": "Noten und Zensuren sind in der Regel...",
+"o": [
+"ein Messwert für Schulleistungen.",
+"hoch korreliert mit der Leistung des Schülers.",
+"eine Skala, die eine Rangfolge beschreibt.",
+"berechenbar."
+],
+"k": "C",
+"t": "Noten als Ordinalskala",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-25",
+"e": "2020w",
+"y": 2020,
+"n": 25,
+"f": "diag",
+"q": "Wie können Sie die Validität eines von Ihnen entwickelten Mathematiktests für die 5. Klassenstufe prüfen?",
+"o": [
+"Sie korrelieren die von Ihnen erhobenen Werte mit einem bereits bestehenden Mathetest für die 5. Klassenstufe.",
+"Sie testen die Aufgaben an einer möglichst großen Stichprobe.",
+"Sie vergleichen die Testleistungen mit dem IQ der Schüler.",
+"Sie führen den Test 2x im Abstand von 3 Wochen bei denselben Schülern durch."
+],
+"k": "A",
+"t": "Validität prüfen (Kriteriumsvalidität)",
+"m": [],
+"h": [
+[
+"NICHT_GEWERTET",
+"Aussage C wurde in der Originalklausur nicht gewertet (strittig: IQ hängt mit Matheleistung zusammen, misst aber ein anderes Konstrukt)."
+]
+],
+"x": "C"
+},
+{
+"id": "2020w-26",
+"e": "2020w",
+"y": 2020,
+"n": 26,
+"f": "diag",
+"q": "Wenn in einem Test Normwerte für sehr viele unterschiedliche Gruppen angegeben sind...",
+"o": [
+"verbessert sich die Differenzierungsfähigkeit.",
+"verbessert sich die Objektivität.",
+"verbessert sich die Validität.",
+"verbessert sich die Testfairness."
+],
+"k": "ACD",
+"t": "Normen für viele Gruppen",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-27",
+"e": "2020w",
+"y": 2020,
+"n": 27,
+"f": "diag",
+"q": "Was versteht man in der klassischen Testtheorie unter einem wahren Wert?",
+"o": [
+"Der wahre Wert ergibt sich, wenn man bei einer Person einen Test mehrfach durchführt und man immer den gleichen Testwert erhält.",
+"Den Mittelwert aus Tests, die das gleiche Konstrukt messen.",
+"Einen Wert, der durch Testverfahren nicht zu ermitteln ist.",
+"Einen Wert, an den man sich mittels reliabler Testverfahren annähern kann."
+],
+"k": "CD",
+"t": "KTT: wahrer Wert",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-28",
+"e": "2020w",
+"y": 2020,
+"n": 28,
+"f": "diag",
+"q": "Die Sensitivität eines Tests verbessert sich, wenn...",
+"o": [
+"sich die Spezifität verringert.",
+"sich die Anzahl der Richtig-Positiven vergrößert.",
+"sich der Mittelwert der Stichprobe verbessert.",
+"sich der Cut-off-Wert in Richtung der Nicht-Eignung verschiebt."
+],
+"k": "BD",
+"t": "Sensitivität und Cut-off",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-29",
+"e": "2020w",
+"y": 2020,
+"n": 29,
+"f": "diag",
+"q": "Was versteht man unter einer systematischen Beobachtung?",
+"o": [
+"Das Verfahren ist hypothesengeleitet.",
+"Die Ergebnisse sind wenig objektiv und reliabel.",
+"Ergebnisse liegen in quantitativer Form vor.",
+"Es werden sytematisch alle Personen beobachtet."
+],
+"k": "AC",
+"t": "Systematische Beobachtung",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-30",
+"e": "2020w",
+"y": 2020,
+"n": 30,
+"f": "diag",
+"q": "Was versteht man unter einer Beobachterdrift?",
+"o": [
+"Ein Beobachter registriert mehr oder weniger relevante Ereignisse als tatsächlich vorkommen.",
+"Beobachtungen werden nicht hinreichend protokolliert.",
+"Ein Beobachter hält irrelevante Ereignisse für relevant.",
+"Einen Effekt, der z.B. durch Ermüdung entsteht."
+],
+"k": "ACD",
+"t": "Beobachterdrift",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-31",
+"e": "2020w",
+"y": 2020,
+"n": 31,
+"f": "entw",
+"q": "Theorien kognitiver Entwicklung. Was sind Kritikpunkte an der Theorie Piagets?",
+"o": [
+"Seine Aussagen waren auf einen zu engen Bereich beschränkt.",
+"Er fokussierte zu sehr auf soziale Prozesse in der Entwicklung.",
+"Seine Stichproben waren nicht repräsentativ.",
+"Entwicklung verläuft über Inhaltsbereiche hinweg einheitlicher, als Piaget annahm."
+],
+"k": "AC",
+"t": "Kritik an Piaget",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-32",
+"e": "2020w",
+"y": 2020,
+"n": 32,
+"f": "entw",
+"q": "Entwicklung aggressiven Verhaltens. Aggressives Verhalten stellt auch im schulischen Kontext ein Problem dar. Welche Aussage/n ist/sind aus entwicklungspsychologischer Sicht zutreffend?",
+"o": [
+"In der Pubertät zeigt sich ein Anstieg aggressiven Verhaltens bei Jungen, aber nicht bei Mädchen.",
+"Frühkindliche Aggression wächst sich in der Regel aus (d.h. reduziert sich auf ein normales Maß), ohne dass interveniert werden muss.",
+"Mädchen beurteilen soziale Aggression als schwerwiegend, üben sie aber trotzdem häufig aus.",
+"Nach dem Prozessmodell sozialen Problemlösens nach Dodge et al. nehmen aggressive Kinder Verhalten eher als feindselig wahr."
+],
+"k": "CD",
+"t": "Entwicklung von Aggression",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-33",
+"e": "2020w",
+"y": 2020,
+"n": 33,
+"f": "entw",
+"q": "Exekutive Funktionen/Kognitive Kontrolle. Welche Situation/en im Schulalltag erfordert/erfordern exekutive Funktionen?",
+"o": [
+"Das stille Melden",
+"Das Spielen von Bewegungs- und Stoppspielen wie z.B. \"Feuer-Wasser-Sturm\" (alle Kinder laufen und müssen auf die Ansage \"Feuer\", \"Wasser\" oder \"Sturm\" hin eine bestimmte Position einnehmen) im Sportunterricht",
+"Das Packen des Ranzens mit den benötigten Utensilien für den nächsten Schultag",
+"Das Behalten des geplanten Beitrags während des Meldens"
+],
+"k": "ABCD",
+"t": "Exekutive Funktionen im Schulalltag",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-34",
+"e": "2020w",
+"y": 2020,
+"n": 34,
+"f": "entw",
+"q": "Theorien kognitiver Entwicklung. Was ist/sind Kernaussage/n des soziokulturellen Ansatzes nach Vygotsky?",
+"o": [
+"Kooperative Lernsettings (wie z.B. Peer-Tutoring) fördern durch Techniken sozialer Stützung die Entwicklung in der Zone proximaler Entwicklung.",
+"Vygotskys Ansatz verbindet behaviorales Lernen und Informationsverarbeitungsaspekte in einer Stufentheorie.",
+"Da Lernen und Entwicklung nach Vygotsky in der sozialen Interaktion stattfinden, sind Kulturwerkzeuge wie Zahlen- und Schreibsysteme in ihrer Rolle für die Denkentwicklung vernachlässigbar.",
+"Indem eine kompetentere Person das Ziel einer Aufgabe und mögliche Lösungswege aufzeigt, wird Lernfortschritt verhindert, da das Kind die Lösung nicht selbstständig konstruieren kann."
+],
+"k": "A",
+"t": "Vygotsky: soziokultureller Ansatz",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-35",
+"e": "2020w",
+"y": 2020,
+"n": 35,
+"f": "entw",
+"q": "Theorien der Entwicklungspsychologie. Worin unterscheiden sich theoretische Ansätze in der Entwicklungspsychologie?",
+"o": [
+"Darin, ob sie eher auf Anlage- oder auf Umwelteinflüsse fokussieren",
+"Darin, ob sie das Individuum eher als aktiv oder passiv sehen",
+"Darin, ob sie sich auf Prozesse oder Zustände beziehen",
+"Darin, ob sie Entwicklung eher als kontinuierlich oder diskontinuierlich sehen"
+],
+"k": "ABD",
+"t": "Grundfragen entwicklungspsychologischer Theorien",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-36",
+"e": "2020w",
+"y": 2020,
+"n": 36,
+"f": "entw",
+"q": "Selbstentwicklung. Das Selbst gilt als begriffliches System der auf die eigene Person gericheten Kognitionen und Einstellungen. Welche Aussage/n ist/sind richtig?",
+"o": [
+"\"Imaginäres Publikum\" beschreibt das Phänomen, dass Jugendliche andauernd darüber nachdenken, was andere über sie denken.",
+"Nach modernen Auffassungen entwickelt sich das Selbstkonzept als Spiegel unserer Umwelt.",
+"Das Selbstkonzept gilt als die affektive Komponente des Selbst.",
+"Bereits im Grundschulalter spielen soziale Vergleiche ein Rolle für die Selbstkonzeptentwicklung."
+],
+"k": "AD",
+"t": "Selbstkonzeptentwicklung",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-37",
+"e": "2020w",
+"y": 2020,
+"n": 37,
+"f": "entw",
+"q": "Gegenstandsbereich. Womit beschäftigt sich die moderne Entwicklungspsychologie?",
+"o": [
+"Mit interindividuellen Differenzen nur im Kindesalter",
+"Mit typischen und atypischen Entwicklungsverläufen",
+"Mit intraindividuellen Veränderungen",
+"Mit Auf- und Abbauprozessen über die Lebensspanne"
+],
+"k": "BCD",
+"t": "Gegenstand der Entwicklungspsychologie",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-38",
+"e": "2020w",
+"y": 2020,
+"n": 38,
+"f": "entw",
+"q": "Informationsverarbeitungsansatz. Was ist/sind nach der Informationsverarbeitungstheorie Motor/en der Entwicklung?",
+"o": [
+"zunehmendes Inhaltswissen",
+"effizientere Kontrollprozesse",
+"biologische Reifungsprozesse",
+"effizientere Reizleitung"
+],
+"k": "ABCD",
+"t": "Informationsverarbeitung: Entwicklungsmotoren",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-39",
+"e": "2020w",
+"y": 2020,
+"n": 39,
+"f": "entw",
+"q": "Moralische und prosoziale Entwicklung. Was ist/sind zentrale Aussage/n zur moralischen Entwicklung nach Kohlberg?",
+"o": [
+"Auf dem postkonventionellen Niveau des moralischen Urteilens nach Kohlberg argumentieren Personen auf der Basis einer Sicht des Systems als Gesellschaftsvertrag.",
+"Studien in der Tradition Kohlbergs finden, dass Bildung keine Rolle für das Niveau moralischen Urteilens spielt.",
+"Eine Unterscheidung von Konventionen und moralischen Normen findet sich kulturübergreifend.",
+"Nach dem Ansatz von Kohlberg sind klare Vorgaben von Seiten Erwachsener wichtiger für die moralische Entwicklung als moralischer Diskurs."
+],
+"k": "AC",
+"t": "Kohlberg: moralisches Urteilen",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-40",
+"e": "2020w",
+"y": 2020,
+"n": 40,
+"f": "entw",
+"q": "Gedächtnisentwicklung. Wie lässt sich die Entwicklung von Gedächtnisstrategien im Vorschul- und Schulalter beschreiben?",
+"o": [
+"Erst im Sekundarschulalter können Strategien genutzt werden.",
+"Wiederholungsstrategien werden vor elaborierenden Strategien genutzt.",
+"Wenn Kinder Strategien nicht selber entdecken, können sie sie nicht nutzen.",
+"Nur sehr leistungsstarke Kinder profitieren von Strategieunterweisung."
+],
+"k": "B",
+"t": "Entwicklung von Gedächtnisstrategien",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-41",
+"e": "2020w",
+"y": 2020,
+"n": 41,
+"f": "entw",
+"q": "Entwicklung im Jugendalter. Die Schüler*innen Ihrer 9. Klasse wirken häufig in den ersten beiden Schulstunden sehr müde auf Sie. Was könnte/n aus entwicklungspsychologischer Sicht Ursache/n hierfür sein?",
+"o": [
+"Der circadiane Rhythmus verschiebt sich im Jugendalter nach hinten.",
+"Jugendliche haben gegenüber Kindern ein erhöhtes Schlafbedürfnis.",
+"Die Zeit des Zubettgehens verschiebt sich im Jugendalter aus sozialen Gründen gegen den biologischen Rhythmus nach hinten.",
+"Aus hormonellen Gründen funktioniert das Wachheitssystem im Jugendalter nicht richtig, so dass Jugendliche immer etwas schläfrig sind."
+],
+"k": "A",
+"t": "Schlaf im Jugendalter (circadianer Rhythmus)",
+"m": [],
+"h": [
+[
+"NICHT_GEWERTET",
+"Aussage C wurde in der Originalklausur nicht gewertet (strittig: soziale Gründe spielen mit, die Verschiebung geht aber mit dem biologischen Rhythmus, nicht gegen ihn)."
+]
+],
+"x": "C"
+},
+{
+"id": "2020w-42",
+"e": "2020w",
+"y": 2020,
+"n": 42,
+"f": "entw",
+"q": "Neurokognitive Entwicklung. Welche Aussage/n zur neurokognitiven Entwicklung ist/sind korrekt?",
+"o": [
+"Langfristiges intensives Lernen kann zu strukturellen Veränderungen im Gehirn führen.",
+"Auf synaptischer Ebene gibt es nur Evidenz für funktionelle Plastizität.",
+"Phasen des vermehrten Auf- und Abbaus synaptischer Verbindungen finden in allen Teilen des Gehirns gleichzeitig statt.",
+"Die Gehirnentwicklung ist mit Eintritt in die Pubertät abgeschlossen."
+],
+"k": "A",
+"t": "Neurokognitive Entwicklung, Plastizität",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-43",
+"e": "2020w",
+"y": 2020,
+"n": 43,
+"f": "entw",
+"q": "Metakognition. Welche Aussage/n gilt/gelten für die Entwicklung der Metakognition?",
+"o": [
+"Das prozedurale Metagedächtnis wird aufgeteilt in Personenmerkmale, Aufgabenmerkmale und Rahmenbedingungen.",
+"Sowohl das deklarative wie auch das prozedurale Metagedächtnis verbessern sich im Laufe der mittleren Kindheit.",
+"Erst im Sekundarschulalter findet sich empirisch ein Zusammenhang zwischen metakognitivem Wissen und Gedächtnisleistung.",
+"Metakognition wird definiert als das Wissen über Wissen und die Überwachung von Denkprozessen anderer Personen."
+],
+"k": "B",
+"t": "Metagedächtnis",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-44",
+"e": "2020w",
+"y": 2020,
+"n": 44,
+"f": "entw",
+"q": "Theorien kognitiver Entwicklung. Zu welchem/welchen entwicklungspsychologischen Ansatz/Ansätzen passt folgendes Zitat? \"Das Miteinander ist der Ursprung und der Motor des Lernens.\"",
+"o": [
+"Informationsverarbeitungsansatz",
+"Reifungsansatz",
+"sozial-konstruktivistischer Ansatz",
+"strukturgenetischer Ansatz"
+],
+"k": "C",
+"t": "Sozial-konstruktivistischer Ansatz",
+"m": [],
+"h": []
+},
+{
+"id": "2020w-45",
+"e": "2020w",
+"y": 2020,
+"n": 45,
+"f": "entw",
+"q": "Methoden der Entwicklungspsychologie. Welche/s der folgenden Forschungsdesigns ist/sind geeignet, um individuelle Unterschiede in entwicklungsmäßigen Veränderungsprozessen zu untersuchen?",
+"o": [
+"Querschnitt Designs",
+"Kohorten-Sequenz-Designs",
+"Längsschnitt Designs",
+"Mikrogenetische Designs"
+],
+"k": "BCD",
+"t": "Forschungsdesigns der Entwicklungspsychologie",
+"m": [],
+"h": []
+},
+{
 "id": "2020-01",
+"e": "2020",
 "y": 2020,
 "n": 1,
 "f": "pers",
@@ -19,6 +842,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-02",
+"e": "2020",
 "y": 2020,
 "n": 2,
 "f": "pers",
@@ -43,6 +867,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-03",
+"e": "2020",
 "y": 2020,
 "n": 3,
 "f": "pers",
@@ -65,6 +890,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-04",
+"e": "2020",
 "y": 2020,
 "n": 4,
 "f": "pers",
@@ -82,6 +908,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-05",
+"e": "2020",
 "y": 2020,
 "n": 5,
 "f": "pers",
@@ -104,6 +931,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-06",
+"e": "2020",
 "y": 2020,
 "n": 6,
 "f": "pers",
@@ -121,6 +949,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-07",
+"e": "2020",
 "y": 2020,
 "n": 7,
 "f": "pers",
@@ -138,6 +967,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-08",
+"e": "2020",
 "y": 2020,
 "n": 8,
 "f": "pers",
@@ -155,6 +985,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-09",
+"e": "2020",
 "y": 2020,
 "n": 9,
 "f": "pers",
@@ -172,6 +1003,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-10",
+"e": "2020",
 "y": 2020,
 "n": 10,
 "f": "pers",
@@ -200,6 +1032,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-11",
+"e": "2020",
 "y": 2020,
 "n": 11,
 "f": "pers",
@@ -222,6 +1055,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-12",
+"e": "2020",
 "y": 2020,
 "n": 12,
 "f": "pers",
@@ -239,6 +1073,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-13",
+"e": "2020",
 "y": 2020,
 "n": 13,
 "f": "diag",
@@ -256,6 +1091,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-14",
+"e": "2020",
 "y": 2020,
 "n": 14,
 "f": "diag",
@@ -273,6 +1109,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-15",
+"e": "2020",
 "y": 2020,
 "n": 15,
 "f": "diag",
@@ -290,6 +1127,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-16",
+"e": "2020",
 "y": 2020,
 "n": 16,
 "f": "diag",
@@ -307,6 +1145,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-17",
+"e": "2020",
 "y": 2020,
 "n": 17,
 "f": "diag",
@@ -324,6 +1163,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-18",
+"e": "2020",
 "y": 2020,
 "n": 18,
 "f": "diag",
@@ -341,6 +1181,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-19",
+"e": "2020",
 "y": 2020,
 "n": 19,
 "f": "diag",
@@ -358,6 +1199,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-20",
+"e": "2020",
 "y": 2020,
 "n": 20,
 "f": "diag",
@@ -375,6 +1217,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-21",
+"e": "2020",
 "y": 2020,
 "n": 21,
 "f": "diag",
@@ -392,6 +1235,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-22",
+"e": "2020",
 "y": 2020,
 "n": 22,
 "f": "diag",
@@ -409,6 +1253,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-23",
+"e": "2020",
 "y": 2020,
 "n": 23,
 "f": "diag",
@@ -426,6 +1271,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-24",
+"e": "2020",
 "y": 2020,
 "n": 24,
 "f": "diag",
@@ -443,6 +1289,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-25",
+"e": "2020",
 "y": 2020,
 "n": 25,
 "f": "entw",
@@ -465,6 +1312,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-26",
+"e": "2020",
 "y": 2020,
 "n": 26,
 "f": "entw",
@@ -487,6 +1335,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-27",
+"e": "2020",
 "y": 2020,
 "n": 27,
 "f": "entw",
@@ -504,6 +1353,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-28",
+"e": "2020",
 "y": 2020,
 "n": 28,
 "f": "entw",
@@ -521,6 +1371,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-29",
+"e": "2020",
 "y": 2020,
 "n": 29,
 "f": "entw",
@@ -543,6 +1394,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-30",
+"e": "2020",
 "y": 2020,
 "n": 30,
 "f": "entw",
@@ -565,6 +1417,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-31",
+"e": "2020",
 "y": 2020,
 "n": 31,
 "f": "entw",
@@ -589,6 +1442,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-32",
+"e": "2020",
 "y": 2020,
 "n": 32,
 "f": "entw",
@@ -606,6 +1460,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-33",
+"e": "2020",
 "y": 2020,
 "n": 33,
 "f": "entw",
@@ -623,6 +1478,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-34",
+"e": "2020",
 "y": 2020,
 "n": 34,
 "f": "entw",
@@ -640,6 +1496,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-35",
+"e": "2020",
 "y": 2020,
 "n": 35,
 "f": "entw",
@@ -657,6 +1514,7 @@ const QUESTIONS = [
 },
 {
 "id": "2020-36",
+"e": "2020",
 "y": 2020,
 "n": 36,
 "f": "entw",
@@ -679,6 +1537,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-01",
+"e": "2021",
 "y": 2021,
 "n": 1,
 "f": "diag",
@@ -696,6 +1555,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-02",
+"e": "2021",
 "y": 2021,
 "n": 2,
 "f": "diag",
@@ -713,6 +1573,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-03",
+"e": "2021",
 "y": 2021,
 "n": 3,
 "f": "diag",
@@ -730,6 +1591,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-04",
+"e": "2021",
 "y": 2021,
 "n": 4,
 "f": "diag",
@@ -747,6 +1609,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-05",
+"e": "2021",
 "y": 2021,
 "n": 5,
 "f": "diag",
@@ -764,6 +1627,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-06",
+"e": "2021",
 "y": 2021,
 "n": 6,
 "f": "diag",
@@ -781,6 +1645,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-07",
+"e": "2021",
 "y": 2021,
 "n": 7,
 "f": "diag",
@@ -798,6 +1663,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-08",
+"e": "2021",
 "y": 2021,
 "n": 8,
 "f": "diag",
@@ -822,6 +1688,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-09",
+"e": "2021",
 "y": 2021,
 "n": 9,
 "f": "diag",
@@ -846,6 +1713,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-10",
+"e": "2021",
 "y": 2021,
 "n": 10,
 "f": "diag",
@@ -863,6 +1731,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-11",
+"e": "2021",
 "y": 2021,
 "n": 11,
 "f": "diag",
@@ -880,6 +1749,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-12",
+"e": "2021",
 "y": 2021,
 "n": 12,
 "f": "diag",
@@ -897,6 +1767,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-13",
+"e": "2021",
 "y": 2021,
 "n": 13,
 "f": "pers",
@@ -926,6 +1797,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-14",
+"e": "2021",
 "y": 2021,
 "n": 14,
 "f": "pers",
@@ -943,6 +1815,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-15",
+"e": "2021",
 "y": 2021,
 "n": 15,
 "f": "pers",
@@ -960,6 +1833,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-16",
+"e": "2021",
 "y": 2021,
 "n": 16,
 "f": "pers",
@@ -977,6 +1851,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-17",
+"e": "2021",
 "y": 2021,
 "n": 17,
 "f": "pers",
@@ -994,6 +1869,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-18",
+"e": "2021",
 "y": 2021,
 "n": 18,
 "f": "pers",
@@ -1018,6 +1894,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-19",
+"e": "2021",
 "y": 2021,
 "n": 19,
 "f": "pers",
@@ -1035,6 +1912,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-20",
+"e": "2021",
 "y": 2021,
 "n": 20,
 "f": "pers",
@@ -1052,6 +1930,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-21",
+"e": "2021",
 "y": 2021,
 "n": 21,
 "f": "pers",
@@ -1080,6 +1959,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-22",
+"e": "2021",
 "y": 2021,
 "n": 22,
 "f": "pers",
@@ -1097,6 +1977,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-23",
+"e": "2021",
 "y": 2021,
 "n": 23,
 "f": "pers",
@@ -1125,6 +2006,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-24",
+"e": "2021",
 "y": 2021,
 "n": 24,
 "f": "pers",
@@ -1142,6 +2024,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-25",
+"e": "2021",
 "y": 2021,
 "n": 25,
 "f": "entw",
@@ -1164,6 +2047,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-26",
+"e": "2021",
 "y": 2021,
 "n": 26,
 "f": "entw",
@@ -1186,6 +2070,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-27",
+"e": "2021",
 "y": 2021,
 "n": 27,
 "f": "entw",
@@ -1208,6 +2093,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-28",
+"e": "2021",
 "y": 2021,
 "n": 28,
 "f": "entw",
@@ -1225,6 +2111,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-29",
+"e": "2021",
 "y": 2021,
 "n": 29,
 "f": "entw",
@@ -1242,6 +2129,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-30",
+"e": "2021",
 "y": 2021,
 "n": 30,
 "f": "entw",
@@ -1259,6 +2147,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-31",
+"e": "2021",
 "y": 2021,
 "n": 31,
 "f": "entw",
@@ -1276,6 +2165,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-32",
+"e": "2021",
 "y": 2021,
 "n": 32,
 "f": "entw",
@@ -1298,6 +2188,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-33",
+"e": "2021",
 "y": 2021,
 "n": 33,
 "f": "entw",
@@ -1320,6 +2211,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-34",
+"e": "2021",
 "y": 2021,
 "n": 34,
 "f": "entw",
@@ -1337,6 +2229,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-35",
+"e": "2021",
 "y": 2021,
 "n": 35,
 "f": "entw",
@@ -1359,6 +2252,7 @@ const QUESTIONS = [
 },
 {
 "id": "2021-36",
+"e": "2021",
 "y": 2021,
 "n": 36,
 "f": "entw",
@@ -1376,6 +2270,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-01",
+"e": "2022",
 "y": 2022,
 "n": 1,
 "f": "entw",
@@ -1393,6 +2288,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-02",
+"e": "2022",
 "y": 2022,
 "n": 2,
 "f": "entw",
@@ -1415,6 +2311,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-03",
+"e": "2022",
 "y": 2022,
 "n": 3,
 "f": "entw",
@@ -1437,6 +2334,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-04",
+"e": "2022",
 "y": 2022,
 "n": 4,
 "f": "entw",
@@ -1454,6 +2352,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-05",
+"e": "2022",
 "y": 2022,
 "n": 5,
 "f": "entw",
@@ -1471,6 +2370,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-06",
+"e": "2022",
 "y": 2022,
 "n": 6,
 "f": "entw",
@@ -1488,6 +2388,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-07",
+"e": "2022",
 "y": 2022,
 "n": 7,
 "f": "entw",
@@ -1510,6 +2411,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-08",
+"e": "2022",
 "y": 2022,
 "n": 8,
 "f": "entw",
@@ -1532,6 +2434,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-09",
+"e": "2022",
 "y": 2022,
 "n": 9,
 "f": "entw",
@@ -1549,6 +2452,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-10",
+"e": "2022",
 "y": 2022,
 "n": 10,
 "f": "entw",
@@ -1571,6 +2475,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-11",
+"e": "2022",
 "y": 2022,
 "n": 11,
 "f": "entw",
@@ -1593,6 +2498,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-12",
+"e": "2022",
 "y": 2022,
 "n": 12,
 "f": "entw",
@@ -1610,6 +2516,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-13",
+"e": "2022",
 "y": 2022,
 "n": 13,
 "f": "diag",
@@ -1627,6 +2534,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-14",
+"e": "2022",
 "y": 2022,
 "n": 14,
 "f": "diag",
@@ -1644,6 +2552,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-15",
+"e": "2022",
 "y": 2022,
 "n": 15,
 "f": "diag",
@@ -1661,6 +2570,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-16",
+"e": "2022",
 "y": 2022,
 "n": 16,
 "f": "diag",
@@ -1678,6 +2588,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-17",
+"e": "2022",
 "y": 2022,
 "n": 17,
 "f": "diag",
@@ -1695,6 +2606,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-18",
+"e": "2022",
 "y": 2022,
 "n": 18,
 "f": "diag",
@@ -1712,6 +2624,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-19",
+"e": "2022",
 "y": 2022,
 "n": 19,
 "f": "diag",
@@ -1729,6 +2642,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-20",
+"e": "2022",
 "y": 2022,
 "n": 20,
 "f": "diag",
@@ -1746,6 +2660,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-21",
+"e": "2022",
 "y": 2022,
 "n": 21,
 "f": "diag",
@@ -1770,6 +2685,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-22",
+"e": "2022",
 "y": 2022,
 "n": 22,
 "f": "diag",
@@ -1787,6 +2703,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-23",
+"e": "2022",
 "y": 2022,
 "n": 23,
 "f": "diag",
@@ -1811,6 +2728,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-24",
+"e": "2022",
 "y": 2022,
 "n": 24,
 "f": "diag",
@@ -1828,6 +2746,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-25",
+"e": "2022",
 "y": 2022,
 "n": 25,
 "f": "pers",
@@ -1856,6 +2775,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-26",
+"e": "2022",
 "y": 2022,
 "n": 26,
 "f": "pers",
@@ -1873,6 +2793,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-27",
+"e": "2022",
 "y": 2022,
 "n": 27,
 "f": "pers",
@@ -1890,6 +2811,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-28",
+"e": "2022",
 "y": 2022,
 "n": 28,
 "f": "pers",
@@ -1907,6 +2829,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-29",
+"e": "2022",
 "y": 2022,
 "n": 29,
 "f": "pers",
@@ -1924,6 +2847,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-30",
+"e": "2022",
 "y": 2022,
 "n": 30,
 "f": "pers",
@@ -1946,6 +2870,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-31",
+"e": "2022",
 "y": 2022,
 "n": 31,
 "f": "pers",
@@ -1963,6 +2888,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-32",
+"e": "2022",
 "y": 2022,
 "n": 32,
 "f": "pers",
@@ -1985,6 +2911,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-33",
+"e": "2022",
 "y": 2022,
 "n": 33,
 "f": "pers",
@@ -2002,6 +2929,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-34",
+"e": "2022",
 "y": 2022,
 "n": 34,
 "f": "pers",
@@ -2024,6 +2952,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-35",
+"e": "2022",
 "y": 2022,
 "n": 35,
 "f": "pers",
@@ -2052,6 +2981,7 @@ const QUESTIONS = [
 },
 {
 "id": "2022-36",
+"e": "2022",
 "y": 2022,
 "n": 36,
 "f": "pers",

@@ -1,6 +1,6 @@
-# Psychologie II (LMU, P 4) – Altklausuren 2020, 2021, 2022: vollständiger Fragen- und Lösungskatalog für 1:1-Abfragen
+# Psychologie II (LMU, P 4) – Altklausuren 2020 (Feb.), 2020 (Juli), 2021, 2022: vollständiger Fragen- und Lösungskatalog für 1:1-Abfragen
 
-Dieses Dokument enthält alle 108 Fragen der drei Altklausuren (je 36 Fragen: 12 Entwicklungspsychologie, 12 Persönlichkeitspsychologie, 12 Pädagogisch-Psychologische Diagnostik) mit Originalwortlaut, den vier Antwortmöglichkeiten A–D in Originalreihenfolge und dem Lösungsschlüssel der Klausur. Es ist so aufgebaut, dass eine KI damit eine Abfrage im exakten Klausurformat durchführen und die Antworten fehlerfrei auswerten kann.
+Dieses Dokument enthält alle 153 Fragen der vier Altklausuren (08.02.2020: 45 Fragen, je 15 pro Fach; 24.07.2020, 16.07.2021, 11.02.2022: je 36 Fragen, je 12 Entwicklungspsychologie, Persönlichkeitspsychologie, Pädagogisch-Psychologische Diagnostik) mit Originalwortlaut, den vier Antwortmöglichkeiten A–D in Originalreihenfolge und dem Lösungsschlüssel der Klausur. Es ist so aufgebaut, dass eine KI damit eine Abfrage im exakten Klausurformat durchführen und die Antworten fehlerfrei auswerten kann.
 
 ## Teil 1 – Anweisungen an die abfragende KI (verbindlich)
 
@@ -42,17 +42,18 @@ Deshalb: **Bevor du Punkte vergibst, frag den Nutzer, nach welcher Regel gezähl
 | **ABGLEICHEN** | Der Schlüssel ist eindeutig gelesen, wirkt aber inhaltlich überraschend. | Normal nach Schlüssel bewerten. Danach den Hinweistext ausgeben und empfehlen, das mit der Vorlesung abzugleichen. |
 | **SPEZIALWISSEN** | Sehr vorlesungsspezifisches Detailwissen. | Normal bewerten; Hinweis nach der Auswertung kurz nennen. |
 | **FRAGESATZ_FEHLT** | Nur die Fallbeschreibung ist übertragen, kein eigentlicher Fragesatz. | Frage wie hier stellen, dem Nutzer den Hinweis geben und fragen, ob er den Fragesatz aus dem Original ergänzen will. |
+| **NICHT_GEWERTET** | Die Aussage wurde in der Originalklausur nicht gewertet (Lösung „NICHT_GEWERTET“, grau im Original). | Aussage zeigen, aber als nicht gewertet kennzeichnen; sie zählt immer als richtig behandelt (+1), egal ob angekreuzt. |
 
 ### 1.6 Abfragemodi (Nutzer fragen, welcher gewünscht ist, falls er es nicht sagt)
 - **Ganze Klausur** (z. B. 2021, Fragen 1–36 in Originalreihenfolge)
-- **Ein Fach** (alle 36 Fragen eines Fachs aus allen drei Jahren)
+- **Ein Fach** (alle 51 Fragen eines Fachs aus allen vier Klausuren)
 - **Zufällig gemischt** (Reihenfolge der Fragen mischen – die Reihenfolge der Antworten A–D innerhalb einer Frage bleibt immer unverändert)
 - **Wiederholung** (nur Fragen, die der Nutzer vorher nicht vollständig richtig hatte)
 
 Am Ende eines Blocks: Anzahl vollständig richtiger Fragen, ggf. Punkte nach der vereinbarten Regel, Liste der Fragen mit Fehlern (Klausur/Frage-Nr./Thema), getrennt ausgewiesen: Fragen mit Markierung UNSICHER.
 
 ### 1.7 Herkunft und Grenzen der Daten (für Rückfragen des Nutzers)
-- Quelle: korrigierte Altklausuren der LMU-Modulprüfung P 4 Psychologie II vom 24.07.2020, 16.07.2021, 11.02.2022.
+- Quelle: korrigierte Altklausuren der LMU-Modulprüfung P 4 Psychologie II vom 08.02.2020, 24.07.2020, 16.07.2021, 11.02.2022.
 - Der Schlüssel wurde aus den Lösungskästchen der korrigierten Klausuren abgelesen (2020 blau, 2021/2022 grün umrandet bzw. angekreuzt). Die abgegebenen Antworten der damaligen Prüfungsperson sind **nicht** der Schlüssel und wurden ignoriert.
 - Die Texte sind Übertragungen aus den Scans. Wenn der Nutzer einen Abweichungsverdacht zum Original hat, gilt das Original; frag nach dem genauen Wortlaut.
 
@@ -68,11 +69,605 @@ Fragen mit Markierung ABGLEICHEN (eindeutig gelesen, inhaltlich überraschend): 
 
 | Klausur | Datum | Fragen 1–12 | Fragen 13–24 | Fragen 25–36 |
 |---|---|---|---|---|
+| 2020w | 08.02.2020 | Persönlichkeit (1–15) | Diagnostik (16–30) | Entwicklung (31–45) |
 | 2020 | 24.07.2020 | Persönlichkeit | Diagnostik | Entwicklung |
 | 2021 | 16.07.2021 | Diagnostik | Persönlichkeit | Entwicklung |
 | 2022 | 11.02.2022 | Entwicklung | Diagnostik | Persönlichkeit |
 
 ## Teil 4 – Alle Fragen in Originalreihenfolge
+
+### Klausur 08.02.2020
+
+#### [2020w-01] Klausur 08.02.2020 · Frage 1 · Persönlichkeit
+
+**Frage:** Beim idiografischen Forschungsansatz liegt der Schwerpunkt auf...
+
+- **A)** Komparationsforschung und Korrelationsforschung.
+- **B)** Psychografie und Variationsforschung.
+- **C)** dem Vergleich von Merkmalen.
+- **D)** dem Vergleich von Individuen.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = FALSCH · C = FALSCH · D = RICHTIG
+
+**Schlüssel:** D · **Thema:** Idiografischer Ansatz: Vergleich von Individuen
+
+#### [2020w-02] Klausur 08.02.2020 · Frage 2 · Persönlichkeit
+
+**Frage:** Welchen Einfluss haben Genom und Umwelt auf die Persönlichkeit?
+
+- **A)** Eltern haben eine größere genetische Ähnlichkeit mit ihren leiblichen Kindern als Geschwister untereinander.
+- **B)** Der Einfluss geteilter Umwelten ist größer als der nicht geteilter.
+- **C)** Werden die eigenschaftswirksamen Umwelten der Populationsmitglieder homogener, steigt der genetische Einfluss.
+- **D)** Der Einfluss von Genen lässt sich in Kombinationsstudien am besten nachweisen.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = FALSCH · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** CD · **Thema:** Anlage und Umwelt (Verhaltensgenetik)
+
+#### [2020w-03] Klausur 08.02.2020 · Frage 3 · Persönlichkeit
+
+**Frage:** Ein Psychogramm beschreibt...
+
+- **A)** vor allem Eigenschaften, die bei einer Person stark ausgeprägt sind.
+- **B)** die Position eines Individuums zwischen zwei Polen bei unterschiedlichen Eigenschaften.
+- **C)** die Durchschnittswerte von Eigenschaften bei einer bestimmten Population.
+- **D)** alle Eigenschaften einer Person.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = RICHTIG · C = FALSCH · D = FALSCH
+
+**Schlüssel:** B · **Thema:** Psychogramm
+
+#### [2020w-04] Klausur 08.02.2020 · Frage 4 · Persönlichkeit
+
+**Frage:** Wie unterscheiden sich Eysencks und Cattells Persönlichkeitstheorien?
+
+- **A)** Eysenck entwickelte ein hierarchisches Modell.
+- **B)** Catell ging von einer größeren Anzahl von Faktoren aus.
+- **C)** Cattell beschrieb die Entwicklung von Persönlichkeitseigenschaften.
+- **D)** Cattell vertrat den idiografischen Forschungsansatz, Eysenck den nomothetischen.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = RICHTIG · C = FALSCH · D = FALSCH
+
+**Schlüssel:** AB · **Thema:** Eysenck vs. Cattell
+
+#### [2020w-05] Klausur 08.02.2020 · Frage 5 · Persönlichkeit
+
+**Frage:** Was ist ein State?
+
+- **A)** Ein Begriff für über Situationen hinweg variierendes Verhalten.
+- **B)** Eine Disposition.
+- **C)** Das aktuelle Eigenschaftsprofil einer Person.
+- **D)** Ein aktueller Zustand.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = FALSCH · D = RICHTIG
+
+**Schlüssel:** AD · **Thema:** State vs. Trait
+
+#### [2020w-06] Klausur 08.02.2020 · Frage 6 · Persönlichkeit
+
+**Frage:** Bei einer Faktorenanalyse stellen Sie fest, dass ein Item auf zwei Faktoren identisch hohe Ladungen erzeugt. Was können Sie tun?
+
+- **A)** Ich ersetze das Item und führe die Analyse erneut durch.
+- **B)** Ich entferne das Item aus einem der beiden Faktoren.
+- **C)** Ich lasse das Item in beiden Faktoren.
+- **D)** Ich entferne das Item aus beiden Faktoren.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = FALSCH · D = RICHTIG
+
+**Schlüssel:** AD · **Thema:** Faktorenanalyse: Doppelladungen
+
+#### [2020w-07] Klausur 08.02.2020 · Frage 7 · Persönlichkeit
+
+**Frage:** Was wird im Allgemeinen als "Naive Persönlichkeitspsychologie" bezeichnet?
+
+- **A)** Vorstellungen von Laien, die zur Beschreibung, Erklärung und Vorhersage von individuellen Besonderheiten dienen.
+- **B)** Vorstellungen von Kindern über die Persönlichkeit eines Menschen.
+- **C)** Aus dem alltäglichen Erleben stammende Schussfolgerungen über Persönlichkeitseigenschaften.
+- **D)** Persönlichkeitstheorien über Kinder.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = RICHTIG · D = FALSCH
+
+**Schlüssel:** AC · **Thema:** Naive Persönlichkeitspsychologie
+
+#### [2020w-08] Klausur 08.02.2020 · Frage 8 · Persönlichkeit
+
+**Frage:** Was gilt für den dimensionalen Charakter von Dispositionen?
+
+- **A)** Jede Eigenschaft hat mindestens drei Dimensionen.
+- **B)** Dispositionen können unterschiedlich stark ausgeprägt sein.
+- **C)** Dispositionen weisen ein Kontinuum auf.
+- **D)** Extreme Ausprägungen sind selten.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = RICHTIG · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** BCD · **Thema:** Dimensionalität von Dispositionen
+
+#### [2020w-09] Klausur 08.02.2020 · Frage 9 · Persönlichkeit
+
+**Frage:** Die Selbstwirksamkeitserwartung bei Schülern...
+
+- **A)** beschreibt die Überzeugung eines Schülers, dass eine bestimmte Handlung zum Ziel führt.
+- **B)** ist zu Beginn der Schullaufbahn hoch und sinkt ab dem Sekundarschulalter wieder ab.
+- **C)** steigt, wenn Schüler Zielerreichungen external attribuieren.
+- **D)** beschreibt die Überzeugung, eine bestimmte Handlung durchführen zu können.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = FALSCH · C = FALSCH · D = RICHTIG
+
+**Schlüssel:** D · **Thema:** Selbstwirksamkeitserwartung
+
+#### [2020w-10] Klausur 08.02.2020 · Frage 10 · Persönlichkeit
+
+**Frage:** Mittels einer Korrelation kann man...
+
+- **A)** Persönlichkeitsprofile aufstellen.
+- **B)** Zusammenhänge zwischen Phänomenen aufdecken.
+- **C)** die Ursachen von Phänomenen entdecken.
+- **D)** Ähnlichkeiten zwischen Personen messen.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = RICHTIG · C = FALSCH · D = FALSCH
+
+**Schlüssel:** B · **Thema:** Korrelation: Zusammenhang, keine Kausalität
+
+#### [2020w-11] Klausur 08.02.2020 · Frage 11 · Persönlichkeit
+
+**Frage:** Kritiker des dispositionalen Ansatzes bemängeln, dass....
+
+- **A)** Persönlichkeitsveränderungen zu wenig berücksichtigt werden.
+- **B)** hinter diesem Ansatz kein theoretisches Konzept steht.
+- **C)** situationale Faktoren überschätzt werden.
+- **D)** er keine Verhaltensvorhersagen zulässt.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = RICHTIG · C = FALSCH · D = RICHTIG
+
+**Schlüssel:** ABD · **Thema:** Kritik am dispositionalen Ansatz
+
+#### [2020w-12] Klausur 08.02.2020 · Frage 12 · Persönlichkeit
+
+**Frage:** Die Faktorenanalyse...
+
+- **A)** hilft bei der Auswahl derjenigen Items, durch die ein Konstrukt erfasst werden kann.
+- **B)** ist ein Verfahren mit dem Konstrukte auf ihre Unabhängigkeit voneinander geprüft werden.
+- **C)** bestimmt die Anzahl von unterschiedlichen Faktoren in einem Itempool.
+- **D)** zeigt, ob verschiedene Items ein ähnliches Konstrukt messen.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = RICHTIG · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** ABCD · **Thema:** Faktorenanalyse: Zweck
+
+#### [2020w-13] Klausur 08.02.2020 · Frage 13 · Persönlichkeit
+
+**Frage:** Nach Freud entstehen Persönlichkeitseigenschaften durch...
+
+- **A)** elterliches Verhalten.
+- **B)** Lernerfahrungen in der Kindheit.
+- **C)** den Einsatz von unterschiedlichen Abwehrmechanismen.
+- **D)** Fixierungen auf verschiedenen Entwicklungsstufen.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** ACD · **Thema:** Freud: Entstehung von Persönlichkeitseigenschaften
+
+#### [2020w-14] Klausur 08.02.2020 · Frage 14 · Persönlichkeit
+
+**Frage:** Wenn ich die durchschnittliche Prüfungsangst in einer 4. Klasse erfasse, handelt es sich um...
+
+- **A)** Komparationsforschung.
+- **B)** eine Untersuchung nach dem nomothetischen Ansatz.
+- **C)** Variationsforschung.
+- **D)** die Erfassung eines Traits.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = RICHTIG · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** BCD · **Thema:** Nomothetischer Ansatz, Variationsforschung
+
+#### [2020w-15] Klausur 08.02.2020 · Frage 15 · Persönlichkeit
+
+**Frage:** Traits sollen...
+
+- **A)** mit anderen Traits korrelieren.
+- **B)** mit States korrelieren.
+- **C)** über ähnliche Situationen hinweg Konsistenz aufweisen.
+- **D)** direkt beobachtbar sein.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = FALSCH · C = RICHTIG · D = FALSCH
+
+**Schlüssel:** C · **Thema:** Traits: transsituative Konsistenz
+
+#### [2020w-16] Klausur 08.02.2020 · Frage 16 · Diagnostik
+
+**Frage:** Der WISC V erfasst...
+
+- **A)** den Gesamt-IQ.
+- **B)** Arbeitsgedächtnis und visuelle Wahrnehmung.
+- **C)** Sprachverständnis und Motivation.
+- **D)** Fluides Schlussfolgern und Verarbeitungsgeschwindigkeit.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = FALSCH · D = RICHTIG
+
+**Schlüssel:** AD · **Thema:** WISC-V: Indizes
+
+#### [2020w-17] Klausur 08.02.2020 · Frage 17 · Diagnostik
+
+**Frage:** Welche Anforderung/en wird/werden an die Konstruktvalidität gestellt?
+
+- **A)** Der Test soll nicht mit Merkmalen korrelieren, die nicht mit dem Konstrukt verbunden sind.
+- **B)** Ein Test soll hoch mit Merkmalen korrelieren, die nach der Theorie mit dem Konstrukt verbunden sind.
+- **C)** Das Konstrukt muss operationalisierbar sein.
+- **D)** Der Test soll die Facetten, die nach der Theorie mit den Konstrukt verbunden sind, möglichst komplett erfassen.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = RICHTIG · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** ABCD · **Thema:** Konstruktvalidität (konvergent/divergent)
+
+#### [2020w-18] Klausur 08.02.2020 · Frage 18 · Diagnostik
+
+**Frage:** Was gilt für die Reliabilität eines Tests?
+
+- **A)** Ein invalider Test kann sehr reliabel sein.
+- **B)** Reliabilität beschreibt die Differenz zwischen wahrem Wert und Testwert.
+- **C)** Die Stabilität eines Merkmals beeinflusst die Reliabilität eines Tests.
+- **D)** Reliabilität kann nur geschätzt werden.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = RICHTIG · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** ABCD · **Thema:** Reliabilität
+
+#### [2020w-19] Klausur 08.02.2020 · Frage 19 · Diagnostik
+
+**Frage:** Worauf sollte man bei den Normwerten eines Tests achten?
+
+- **A)** Die Normwerte sollten möglichst aktuell sein.
+- **B)** Die Normierungsstichprobe sollte möglichst groß sein.
+- **C)** Die Stichprobe sollte repräsentativ für die Population sein, für die der Test Gültigkeit beansprucht.
+- **D)** Es sollten Normen vorliegen, die den Test mit anderen Tests vergleichbar machen.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = RICHTIG · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** ABCD · **Thema:** Normierung
+
+#### [2020w-20] Klausur 08.02.2020 · Frage 20 · Diagnostik
+
+**Frage:** Interpretieren Sie folgenden Befund: Die Korrelation zwischen Prüfungsangst und der Leistung im Sport beträgt r = -.6
+
+- **A)** Aufgrund von Prüfungsangst haben 49% der Schüler eine schlechtere Sportleistung.
+- **B)** Die Note in Sport wird zu 60% von der Prüfungsangst bestimmt.
+- **C)** 36% der Leistungsvarianz im Sport wird durch Prüfungsangst erklärt.
+- **D)** Je besser die Sportleistung, desto niedriger ist die Prüfungsangst.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = FALSCH · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** CD · **Thema:** Korrelation interpretieren (r², Richtung)
+
+#### [2020w-21] Klausur 08.02.2020 · Frage 21 · Diagnostik
+
+**Frage:** Wenn zwei Lehrer dieselbe Mathearbeit unterschiedlich benoten, ist das ein Beispiel für...
+
+- **A)** mangelnde Konstruktvalidität.
+- **B)** mangelnde Auswertungsobjektivität.
+- **C)** mangelnde Interpretationsobjektivität.
+- **D)** mangelnde Durchführungsobjektivität.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = RICHTIG · C = RICHTIG · D = FALSCH
+
+**Schlüssel:** BC · **Thema:** Arten der Objektivität
+
+#### [2020w-22] Klausur 08.02.2020 · Frage 22 · Diagnostik
+
+**Frage:** Welche Aussage/n gilt/gelten für Daten in der empirischen Psychologie?
+
+- **A)** Nicht alle Formen von Daten sind für Kausalaussagen geeignet.
+- **B)** Daten sind in der Regel normalverteilt.
+- **C)** Daten dienen zur Verifizierung von Theorien.
+- **D)** Daten entstehen durch Beobachtung oder Befragung.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = RICHTIG · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** ABCD · **Thema:** Daten in der empirischen Psychologie
+
+#### [2020w-23] Klausur 08.02.2020 · Frage 23 · Diagnostik
+
+**Frage:** Was gilt für den Intelligenzquotienten?
+
+- **A)** Der Intelligenzwert eines Individuums wird mit dem Mittelwert seiner Altrsgruppe verglichen.
+- **B)** Intelligenzmessungen sind schon bei Dreijährigen stabil.
+- **C)** Die Standardabweichung im IQ-Test beträgt 10 IQ-Punkte.
+- **D)** Der IQ ist im Alter zwischen 20 und 25 in der Regel am höchsten.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = FALSCH · D = RICHTIG
+
+**Schlüssel:** AD · **Thema:** Intelligenzquotient
+
+#### [2020w-24] Klausur 08.02.2020 · Frage 24 · Diagnostik
+
+**Frage:** Noten und Zensuren sind in der Regel...
+
+- **A)** ein Messwert für Schulleistungen.
+- **B)** hoch korreliert mit der Leistung des Schülers.
+- **C)** eine Skala, die eine Rangfolge beschreibt.
+- **D)** berechenbar.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = FALSCH · C = RICHTIG · D = FALSCH
+
+**Schlüssel:** C · **Thema:** Noten als Ordinalskala
+
+#### [2020w-25] Klausur 08.02.2020 · Frage 25 · Diagnostik
+
+**Frage:** Wie können Sie die Validität eines von Ihnen entwickelten Mathematiktests für die 5. Klassenstufe prüfen?
+
+- **A)** Sie korrelieren die von Ihnen erhobenen Werte mit einem bereits bestehenden Mathetest für die 5. Klassenstufe.
+- **B)** Sie testen die Aufgaben an einer möglichst großen Stichprobe.
+- **C)** Sie vergleichen die Testleistungen mit dem IQ der Schüler.
+- **D)** Sie führen den Test 2x im Abstand von 3 Wochen bei denselben Schülern durch.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = NICHT_GEWERTET · D = FALSCH
+
+**Schlüssel:** A · **Thema:** Validität prüfen (Kriteriumsvalidität)
+
+**Hinweise:**
+- NICHT_GEWERTET: Aussage C wurde in der Originalklausur nicht gewertet (strittig: IQ hängt mit Matheleistung zusammen, misst aber ein anderes Konstrukt).
+
+#### [2020w-26] Klausur 08.02.2020 · Frage 26 · Diagnostik
+
+**Frage:** Wenn in einem Test Normwerte für sehr viele unterschiedliche Gruppen angegeben sind...
+
+- **A)** verbessert sich die Differenzierungsfähigkeit.
+- **B)** verbessert sich die Objektivität.
+- **C)** verbessert sich die Validität.
+- **D)** verbessert sich die Testfairness.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** ACD · **Thema:** Normen für viele Gruppen
+
+#### [2020w-27] Klausur 08.02.2020 · Frage 27 · Diagnostik
+
+**Frage:** Was versteht man in der klassischen Testtheorie unter einem wahren Wert?
+
+- **A)** Der wahre Wert ergibt sich, wenn man bei einer Person einen Test mehrfach durchführt und man immer den gleichen Testwert erhält.
+- **B)** Den Mittelwert aus Tests, die das gleiche Konstrukt messen.
+- **C)** Einen Wert, der durch Testverfahren nicht zu ermitteln ist.
+- **D)** Einen Wert, an den man sich mittels reliabler Testverfahren annähern kann.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = FALSCH · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** CD · **Thema:** KTT: wahrer Wert
+
+#### [2020w-28] Klausur 08.02.2020 · Frage 28 · Diagnostik
+
+**Frage:** Die Sensitivität eines Tests verbessert sich, wenn...
+
+- **A)** sich die Spezifität verringert.
+- **B)** sich die Anzahl der Richtig-Positiven vergrößert.
+- **C)** sich der Mittelwert der Stichprobe verbessert.
+- **D)** sich der Cut-off-Wert in Richtung der Nicht-Eignung verschiebt.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = RICHTIG · C = FALSCH · D = RICHTIG
+
+**Schlüssel:** BD · **Thema:** Sensitivität und Cut-off
+
+#### [2020w-29] Klausur 08.02.2020 · Frage 29 · Diagnostik
+
+**Frage:** Was versteht man unter einer systematischen Beobachtung?
+
+- **A)** Das Verfahren ist hypothesengeleitet.
+- **B)** Die Ergebnisse sind wenig objektiv und reliabel.
+- **C)** Ergebnisse liegen in quantitativer Form vor.
+- **D)** Es werden sytematisch alle Personen beobachtet.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = RICHTIG · D = FALSCH
+
+**Schlüssel:** AC · **Thema:** Systematische Beobachtung
+
+#### [2020w-30] Klausur 08.02.2020 · Frage 30 · Diagnostik
+
+**Frage:** Was versteht man unter einer Beobachterdrift?
+
+- **A)** Ein Beobachter registriert mehr oder weniger relevante Ereignisse als tatsächlich vorkommen.
+- **B)** Beobachtungen werden nicht hinreichend protokolliert.
+- **C)** Ein Beobachter hält irrelevante Ereignisse für relevant.
+- **D)** Einen Effekt, der z.B. durch Ermüdung entsteht.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** ACD · **Thema:** Beobachterdrift
+
+#### [2020w-31] Klausur 08.02.2020 · Frage 31 · Entwicklung
+
+**Frage:** Theorien kognitiver Entwicklung. Was sind Kritikpunkte an der Theorie Piagets?
+
+- **A)** Seine Aussagen waren auf einen zu engen Bereich beschränkt.
+- **B)** Er fokussierte zu sehr auf soziale Prozesse in der Entwicklung.
+- **C)** Seine Stichproben waren nicht repräsentativ.
+- **D)** Entwicklung verläuft über Inhaltsbereiche hinweg einheitlicher, als Piaget annahm.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = RICHTIG · D = FALSCH
+
+**Schlüssel:** AC · **Thema:** Kritik an Piaget
+
+#### [2020w-32] Klausur 08.02.2020 · Frage 32 · Entwicklung
+
+**Frage:** Entwicklung aggressiven Verhaltens. Aggressives Verhalten stellt auch im schulischen Kontext ein Problem dar. Welche Aussage/n ist/sind aus entwicklungspsychologischer Sicht zutreffend?
+
+- **A)** In der Pubertät zeigt sich ein Anstieg aggressiven Verhaltens bei Jungen, aber nicht bei Mädchen.
+- **B)** Frühkindliche Aggression wächst sich in der Regel aus (d.h. reduziert sich auf ein normales Maß), ohne dass interveniert werden muss.
+- **C)** Mädchen beurteilen soziale Aggression als schwerwiegend, üben sie aber trotzdem häufig aus.
+- **D)** Nach dem Prozessmodell sozialen Problemlösens nach Dodge et al. nehmen aggressive Kinder Verhalten eher als feindselig wahr.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = FALSCH · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** CD · **Thema:** Entwicklung von Aggression
+
+#### [2020w-33] Klausur 08.02.2020 · Frage 33 · Entwicklung
+
+**Frage:** Exekutive Funktionen/Kognitive Kontrolle. Welche Situation/en im Schulalltag erfordert/erfordern exekutive Funktionen?
+
+- **A)** Das stille Melden
+- **B)** Das Spielen von Bewegungs- und Stoppspielen wie z.B. "Feuer-Wasser-Sturm" (alle Kinder laufen und müssen auf die Ansage "Feuer", "Wasser" oder "Sturm" hin eine bestimmte Position einnehmen) im Sportunterricht
+- **C)** Das Packen des Ranzens mit den benötigten Utensilien für den nächsten Schultag
+- **D)** Das Behalten des geplanten Beitrags während des Meldens
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = RICHTIG · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** ABCD · **Thema:** Exekutive Funktionen im Schulalltag
+
+#### [2020w-34] Klausur 08.02.2020 · Frage 34 · Entwicklung
+
+**Frage:** Theorien kognitiver Entwicklung. Was ist/sind Kernaussage/n des soziokulturellen Ansatzes nach Vygotsky?
+
+- **A)** Kooperative Lernsettings (wie z.B. Peer-Tutoring) fördern durch Techniken sozialer Stützung die Entwicklung in der Zone proximaler Entwicklung.
+- **B)** Vygotskys Ansatz verbindet behaviorales Lernen und Informationsverarbeitungsaspekte in einer Stufentheorie.
+- **C)** Da Lernen und Entwicklung nach Vygotsky in der sozialen Interaktion stattfinden, sind Kulturwerkzeuge wie Zahlen- und Schreibsysteme in ihrer Rolle für die Denkentwicklung vernachlässigbar.
+- **D)** Indem eine kompetentere Person das Ziel einer Aufgabe und mögliche Lösungswege aufzeigt, wird Lernfortschritt verhindert, da das Kind die Lösung nicht selbstständig konstruieren kann.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = FALSCH · D = FALSCH
+
+**Schlüssel:** A · **Thema:** Vygotsky: soziokultureller Ansatz
+
+#### [2020w-35] Klausur 08.02.2020 · Frage 35 · Entwicklung
+
+**Frage:** Theorien der Entwicklungspsychologie. Worin unterscheiden sich theoretische Ansätze in der Entwicklungspsychologie?
+
+- **A)** Darin, ob sie eher auf Anlage- oder auf Umwelteinflüsse fokussieren
+- **B)** Darin, ob sie das Individuum eher als aktiv oder passiv sehen
+- **C)** Darin, ob sie sich auf Prozesse oder Zustände beziehen
+- **D)** Darin, ob sie Entwicklung eher als kontinuierlich oder diskontinuierlich sehen
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = RICHTIG · C = FALSCH · D = RICHTIG
+
+**Schlüssel:** ABD · **Thema:** Grundfragen entwicklungspsychologischer Theorien
+
+#### [2020w-36] Klausur 08.02.2020 · Frage 36 · Entwicklung
+
+**Frage:** Selbstentwicklung. Das Selbst gilt als begriffliches System der auf die eigene Person gericheten Kognitionen und Einstellungen. Welche Aussage/n ist/sind richtig?
+
+- **A)** "Imaginäres Publikum" beschreibt das Phänomen, dass Jugendliche andauernd darüber nachdenken, was andere über sie denken.
+- **B)** Nach modernen Auffassungen entwickelt sich das Selbstkonzept als Spiegel unserer Umwelt.
+- **C)** Das Selbstkonzept gilt als die affektive Komponente des Selbst.
+- **D)** Bereits im Grundschulalter spielen soziale Vergleiche ein Rolle für die Selbstkonzeptentwicklung.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = FALSCH · D = RICHTIG
+
+**Schlüssel:** AD · **Thema:** Selbstkonzeptentwicklung
+
+#### [2020w-37] Klausur 08.02.2020 · Frage 37 · Entwicklung
+
+**Frage:** Gegenstandsbereich. Womit beschäftigt sich die moderne Entwicklungspsychologie?
+
+- **A)** Mit interindividuellen Differenzen nur im Kindesalter
+- **B)** Mit typischen und atypischen Entwicklungsverläufen
+- **C)** Mit intraindividuellen Veränderungen
+- **D)** Mit Auf- und Abbauprozessen über die Lebensspanne
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = RICHTIG · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** BCD · **Thema:** Gegenstand der Entwicklungspsychologie
+
+#### [2020w-38] Klausur 08.02.2020 · Frage 38 · Entwicklung
+
+**Frage:** Informationsverarbeitungsansatz. Was ist/sind nach der Informationsverarbeitungstheorie Motor/en der Entwicklung?
+
+- **A)** zunehmendes Inhaltswissen
+- **B)** effizientere Kontrollprozesse
+- **C)** biologische Reifungsprozesse
+- **D)** effizientere Reizleitung
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = RICHTIG · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** ABCD · **Thema:** Informationsverarbeitung: Entwicklungsmotoren
+
+#### [2020w-39] Klausur 08.02.2020 · Frage 39 · Entwicklung
+
+**Frage:** Moralische und prosoziale Entwicklung. Was ist/sind zentrale Aussage/n zur moralischen Entwicklung nach Kohlberg?
+
+- **A)** Auf dem postkonventionellen Niveau des moralischen Urteilens nach Kohlberg argumentieren Personen auf der Basis einer Sicht des Systems als Gesellschaftsvertrag.
+- **B)** Studien in der Tradition Kohlbergs finden, dass Bildung keine Rolle für das Niveau moralischen Urteilens spielt.
+- **C)** Eine Unterscheidung von Konventionen und moralischen Normen findet sich kulturübergreifend.
+- **D)** Nach dem Ansatz von Kohlberg sind klare Vorgaben von Seiten Erwachsener wichtiger für die moralische Entwicklung als moralischer Diskurs.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = RICHTIG · D = FALSCH
+
+**Schlüssel:** AC · **Thema:** Kohlberg: moralisches Urteilen
+
+#### [2020w-40] Klausur 08.02.2020 · Frage 40 · Entwicklung
+
+**Frage:** Gedächtnisentwicklung. Wie lässt sich die Entwicklung von Gedächtnisstrategien im Vorschul- und Schulalter beschreiben?
+
+- **A)** Erst im Sekundarschulalter können Strategien genutzt werden.
+- **B)** Wiederholungsstrategien werden vor elaborierenden Strategien genutzt.
+- **C)** Wenn Kinder Strategien nicht selber entdecken, können sie sie nicht nutzen.
+- **D)** Nur sehr leistungsstarke Kinder profitieren von Strategieunterweisung.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = RICHTIG · C = FALSCH · D = FALSCH
+
+**Schlüssel:** B · **Thema:** Entwicklung von Gedächtnisstrategien
+
+#### [2020w-41] Klausur 08.02.2020 · Frage 41 · Entwicklung
+
+**Frage:** Entwicklung im Jugendalter. Die Schüler*innen Ihrer 9. Klasse wirken häufig in den ersten beiden Schulstunden sehr müde auf Sie. Was könnte/n aus entwicklungspsychologischer Sicht Ursache/n hierfür sein?
+
+- **A)** Der circadiane Rhythmus verschiebt sich im Jugendalter nach hinten.
+- **B)** Jugendliche haben gegenüber Kindern ein erhöhtes Schlafbedürfnis.
+- **C)** Die Zeit des Zubettgehens verschiebt sich im Jugendalter aus sozialen Gründen gegen den biologischen Rhythmus nach hinten.
+- **D)** Aus hormonellen Gründen funktioniert das Wachheitssystem im Jugendalter nicht richtig, so dass Jugendliche immer etwas schläfrig sind.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = NICHT_GEWERTET · D = FALSCH
+
+**Schlüssel:** A · **Thema:** Schlaf im Jugendalter (circadianer Rhythmus)
+
+**Hinweise:**
+- NICHT_GEWERTET: Aussage C wurde in der Originalklausur nicht gewertet (strittig: soziale Gründe spielen mit, die Verschiebung geht aber mit dem biologischen Rhythmus, nicht gegen ihn).
+
+#### [2020w-42] Klausur 08.02.2020 · Frage 42 · Entwicklung
+
+**Frage:** Neurokognitive Entwicklung. Welche Aussage/n zur neurokognitiven Entwicklung ist/sind korrekt?
+
+- **A)** Langfristiges intensives Lernen kann zu strukturellen Veränderungen im Gehirn führen.
+- **B)** Auf synaptischer Ebene gibt es nur Evidenz für funktionelle Plastizität.
+- **C)** Phasen des vermehrten Auf- und Abbaus synaptischer Verbindungen finden in allen Teilen des Gehirns gleichzeitig statt.
+- **D)** Die Gehirnentwicklung ist mit Eintritt in die Pubertät abgeschlossen.
+
+**Lösung (erst nach der Antwort zeigen):** A = RICHTIG · B = FALSCH · C = FALSCH · D = FALSCH
+
+**Schlüssel:** A · **Thema:** Neurokognitive Entwicklung, Plastizität
+
+#### [2020w-43] Klausur 08.02.2020 · Frage 43 · Entwicklung
+
+**Frage:** Metakognition. Welche Aussage/n gilt/gelten für die Entwicklung der Metakognition?
+
+- **A)** Das prozedurale Metagedächtnis wird aufgeteilt in Personenmerkmale, Aufgabenmerkmale und Rahmenbedingungen.
+- **B)** Sowohl das deklarative wie auch das prozedurale Metagedächtnis verbessern sich im Laufe der mittleren Kindheit.
+- **C)** Erst im Sekundarschulalter findet sich empirisch ein Zusammenhang zwischen metakognitivem Wissen und Gedächtnisleistung.
+- **D)** Metakognition wird definiert als das Wissen über Wissen und die Überwachung von Denkprozessen anderer Personen.
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = RICHTIG · C = FALSCH · D = FALSCH
+
+**Schlüssel:** B · **Thema:** Metagedächtnis
+
+#### [2020w-44] Klausur 08.02.2020 · Frage 44 · Entwicklung
+
+**Frage:** Theorien kognitiver Entwicklung. Zu welchem/welchen entwicklungspsychologischen Ansatz/Ansätzen passt folgendes Zitat? "Das Miteinander ist der Ursprung und der Motor des Lernens."
+
+- **A)** Informationsverarbeitungsansatz
+- **B)** Reifungsansatz
+- **C)** sozial-konstruktivistischer Ansatz
+- **D)** strukturgenetischer Ansatz
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = FALSCH · C = RICHTIG · D = FALSCH
+
+**Schlüssel:** C · **Thema:** Sozial-konstruktivistischer Ansatz
+
+#### [2020w-45] Klausur 08.02.2020 · Frage 45 · Entwicklung
+
+**Frage:** Methoden der Entwicklungspsychologie. Welche/s der folgenden Forschungsdesigns ist/sind geeignet, um individuelle Unterschiede in entwicklungsmäßigen Veränderungsprozessen zu untersuchen?
+
+- **A)** Querschnitt Designs
+- **B)** Kohorten-Sequenz-Designs
+- **C)** Längsschnitt Designs
+- **D)** Mikrogenetische Designs
+
+**Lösung (erst nach der Antwort zeigen):** A = FALSCH · B = RICHTIG · C = RICHTIG · D = RICHTIG
+
+**Schlüssel:** BCD · **Thema:** Forschungsdesigns der Entwicklungspsychologie
 
 ### Klausur 24.07.2020
 
@@ -1602,6 +2197,51 @@ Fragen mit Markierung ABGLEICHEN (eindeutig gelesen, inhaltlich überraschend): 
 
 | ID | Fach | Schlüssel | Markierungen |
 |---|---|---|---|
+| 2020w-01 | Persönlichkeit | D | – |
+| 2020w-02 | Persönlichkeit | CD | – |
+| 2020w-03 | Persönlichkeit | B | – |
+| 2020w-04 | Persönlichkeit | AB | – |
+| 2020w-05 | Persönlichkeit | AD | – |
+| 2020w-06 | Persönlichkeit | AD | – |
+| 2020w-07 | Persönlichkeit | AC | – |
+| 2020w-08 | Persönlichkeit | BCD | – |
+| 2020w-09 | Persönlichkeit | D | – |
+| 2020w-10 | Persönlichkeit | B | – |
+| 2020w-11 | Persönlichkeit | ABD | – |
+| 2020w-12 | Persönlichkeit | ABCD | – |
+| 2020w-13 | Persönlichkeit | ACD | – |
+| 2020w-14 | Persönlichkeit | BCD | – |
+| 2020w-15 | Persönlichkeit | C | – |
+| 2020w-16 | Diagnostik | AD | – |
+| 2020w-17 | Diagnostik | ABCD | – |
+| 2020w-18 | Diagnostik | ABCD | – |
+| 2020w-19 | Diagnostik | ABCD | – |
+| 2020w-20 | Diagnostik | CD | – |
+| 2020w-21 | Diagnostik | BC | – |
+| 2020w-22 | Diagnostik | ABCD | – |
+| 2020w-23 | Diagnostik | AD | – |
+| 2020w-24 | Diagnostik | C | – |
+| 2020w-25 | Diagnostik | A | NICHT_GEWERTET C |
+| 2020w-26 | Diagnostik | ACD | – |
+| 2020w-27 | Diagnostik | CD | – |
+| 2020w-28 | Diagnostik | BD | – |
+| 2020w-29 | Diagnostik | AC | – |
+| 2020w-30 | Diagnostik | ACD | – |
+| 2020w-31 | Entwicklung | AC | – |
+| 2020w-32 | Entwicklung | CD | – |
+| 2020w-33 | Entwicklung | ABCD | – |
+| 2020w-34 | Entwicklung | A | – |
+| 2020w-35 | Entwicklung | ABD | – |
+| 2020w-36 | Entwicklung | AD | – |
+| 2020w-37 | Entwicklung | BCD | – |
+| 2020w-38 | Entwicklung | ABCD | – |
+| 2020w-39 | Entwicklung | AC | – |
+| 2020w-40 | Entwicklung | B | – |
+| 2020w-41 | Entwicklung | A | NICHT_GEWERTET C |
+| 2020w-42 | Entwicklung | A | – |
+| 2020w-43 | Entwicklung | B | – |
+| 2020w-44 | Entwicklung | C | – |
+| 2020w-45 | Entwicklung | BCD | – |
 | 2020-01 | Persönlichkeit | BCD | – |
 | 2020-02 | Persönlichkeit | ABC | ABGLEICHEN |
 | 2020-03 | Persönlichkeit | BCD | – |
@@ -1711,4 +2351,4 @@ Fragen mit Markierung ABGLEICHEN (eindeutig gelesen, inhaltlich überraschend): 
 | 2022-35 | Persönlichkeit | B | ABGLEICHEN |
 | 2022-36 | Persönlichkeit | ACD | – |
 
-Prüfsumme: 108 Fragen; Anzahl Fragen mit 1/2/3/4 richtigen Aussagen: 25/42/31/10.
+Prüfsumme: 153 Fragen; Anzahl Fragen mit 1/2/3/4 richtigen Aussagen: 38/58/40/17 (ohne nicht gewertete Aussagen).
