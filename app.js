@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '1.2';
+const VERSION = '1.3';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
