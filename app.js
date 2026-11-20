@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '1.5';
+const VERSION = '1.6';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
@@ -25,21 +25,29 @@ const SHORT = { pers: 'Persönl.', entw: 'Entwickl.' };
 /* Reiter in Wischreihenfolge; die drei Bereiche teilen sich unten einen Punkt, bis man drin ist */
 const TABS = [['pers', 'Persönlichkeit'], ['entw', 'Entwicklung'], ['diag', 'Diagnostik'], ['mix', 'Gemischt'], ['hist', 'Versuche']];
 const ORDER = TABS.map(t => t[0]);
+const EXAM_MIN = 90;
+const GOALS = [6, 12, 20, 36];
+const LVL = ['Neu', 'Gesehen', 'Sicher', 'Gemeistert'];
 
 const BYID = {};
 QUESTIONS.forEach(q => { BYID[q.id] = q; });
 
 /* ---------- Speicher ---------- */
-function blank() { return { v: 1, open: {}, done: [], set: { theme: 'system', fach: 'pers' } }; }
+function blank() { return { v: 1, open: {}, done: [], set: {}, badges: {} }; }
 function load() {
+  let d = null;
   try {
-    const d = JSON.parse(localStorage.getItem(KEY));
-    if (d && d.v === 1 && d.open && Array.isArray(d.done)) { d.set = d.set || { theme: 'system' }; return d; }
-  } catch (e) { /* leer */ }
-  return blank();
+    d = JSON.parse(localStorage.getItem(KEY));
+    if (!(d && d.v === 1 && d.open && Array.isArray(d.done))) d = null;
+  } catch (e) { d = null; }
+  d = d || blank();
+  d.set = Object.assign({ theme: 'system', fach: 'pers', goal: 12, examDate: null }, d.set || {});
+  d.badges = d.badges || {};
+  return d;
 }
 let DB = load();
 function save() {
+  HC = null;
   try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) { /* voll oder gesperrt */ }
 }
 
@@ -51,11 +59,16 @@ function shuffle(a) {
   return a;
 }
 function ofFach(f) { return QUESTIONS.filter(q => q.f === f).map(q => q.id); }
+const p2 = n => String(n).padStart(2, '0');
 function fmtDate(ts) {
   const d = new Date(ts);
-  const p = n => String(n).padStart(2, '0');
-  return `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()}, ${p(d.getHours())}:${p(d.getMinutes())}`;
+  return `${p2(d.getDate())}.${p2(d.getMonth() + 1)}.${d.getFullYear()}, ${p2(d.getHours())}:${p2(d.getMinutes())}`;
 }
+function fmtDay(ts) { const d = new Date(ts); return `${p2(d.getDate())}.${p2(d.getMonth() + 1)}.${d.getFullYear()}`; }
+function fmtDur(ms) { const s = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(s / 60)}:${p2(s % 60)}`; }
+function dayKey(ts) { const d = new Date(ts); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`; }
+function dayNum(key) { const [y, m, d] = key.split('-').map(Number); return Math.round(new Date(y, m - 1, d, 12) / 864e5); }
+
 /* Auswertung einer Antwort: korrekt behandelte Aussagen (0–4) und vollständig richtig */
 function grade(q, a) {
   let n = 0;
@@ -74,37 +87,170 @@ function runStats(run) {
     if (g.full) full++; else wrong.push(id);
     if (BYID[id].m.includes('UNSICHER')) unsure.push(id);
   });
-  const max = 4 * ids.length;
+  /* Klausur-Modus: unbeantwortete Fragen zählen mit 0 Punkten */
+  if (run.exam) run.ids.forEach(id => { if (run.ans[id] === undefined) wrong.push(id); });
+  const max = 4 * (run.exam ? run.ids.length : ids.length);
   return { answered: ids.length, total: run.ids.length, full, stm, pts, max, pass: max > 0 && pts >= PASS * max, wrong, unsure, ids };
 }
-/* Letzter Stand je Frage über alle Versuche */
-function lastStatus() {
-  const last = {};
-  const runs = DB.done.concat(Object.values(DB.open));
-  runs.forEach(r => {
-    Object.keys(r.ans).forEach(id => {
-      const t = (r.at && r.at[id]) || r.start;
-      if (!last[id] || last[id].t < t) last[id] = { t, full: grade(BYID[id], r.ans[id]).full };
+const pctOf = r => { const s = runStats(r); return s.max ? Math.round(100 * s.pts / s.max) : 0; };
+
+/* ---------- Lernstand aus allen Antworten ----------
+   Stufe: 0 neu · 1 gesehen (noch nicht richtig / zuletzt falsch) · 2 sicher (richtig an 1–2 Tagen) · 3 gemeistert (richtig an 3 Tagen ohne Fehler dazwischen).
+   Fällig: nach falsch am nächsten Tag, sonst nach 3 / 7 / 14 Tagen. */
+const INTERVAL = [1, 3, 7, 14];
+function histRuns() { return DB.done.concat(Object.values(DB.open).filter(r => !r.exam)); }
+let HC = null;
+function H() {
+  if (HC) return HC;
+  const ev = {};
+  histRuns().forEach(r => Object.keys(r.ans).forEach(id => {
+    if (!BYID[id]) return;
+    (ev[id] = ev[id] || []).push([(r.at && r.at[id]) || r.start, grade(BYID[id], r.ans[id]).full]);
+  }));
+  const q = {}, days = {};
+  let resc = 0;
+  const today = dayNum(dayKey(Date.now()));
+  Object.keys(ev).forEach(id => {
+    const e = ev[id].sort((a, b) => a[0] - b[0]);
+    let c = 0, lastUp = null, prev = null;
+    e.forEach(([t, full]) => {
+      const k = dayKey(t);
+      days[k] = (days[k] || 0) + 1;
+      if (full) {
+        if (prev === false) resc++;
+        if (k !== lastUp) { c++; lastUp = k; }
+      } else { c = 0; lastUp = null; }
+      prev = full;
     });
+    const last = dayNum(dayKey(e[e.length - 1][0]));
+    q[id] = { c, lvl: c === 0 ? 1 : c < 3 ? 2 : 3, due: today >= last + INTERVAL[Math.min(c, 3)], full: prev };
   });
-  return last;
+  HC = { q, days, resc, today };
+  return HC;
+}
+const lvl = id => (H().q[id] ? H().q[id].lvl : 0);
+const isDue = id => !!(H().q[id] && H().q[id].due);
+/* Letzter Stand je Frage (für „bisher Falsche“) */
+function lastStatus() {
+  const out = {};
+  Object.entries(H().q).forEach(([id, x]) => { out[id] = { full: x.full }; });
+  return out;
+}
+/* Lerntage-Kette: Tage mit mindestens einer Antwort; höchstens ein Pausetag je 7 Tage. Heute zählt erst, wenn gelernt. */
+function streakNow() {
+  const days = H().days;
+  const keys = Object.keys(days);
+  if (!keys.length) return 0;
+  const first = keys.sort()[0];
+  const d = new Date(); d.setHours(12, 0, 0, 0);
+  if (!days[dayKey(d)]) d.setDate(d.getDate() - 1);
+  let n = 0, lastMiss = null;
+  while (dayKey(d) >= first) {
+    if (days[dayKey(d)]) n++;
+    else {
+      if (lastMiss !== null && lastMiss - dayNum(dayKey(d)) < 7) break;
+      lastMiss = dayNum(dayKey(d));
+    }
+    d.setDate(d.getDate() - 1);
+  }
+  return n;
+}
+/* Gerettet: Antwort vollständig richtig, die vorherige Antwort auf dieselbe Frage war falsch */
+function rescuedIn(run) {
+  const others = histRuns().filter(r => r !== run && r.id !== run.id);
+  return Object.keys(run.ans).filter(id => {
+    if (!grade(BYID[id], run.ans[id]).full) return false;
+    const t = (run.at && run.at[id]) || run.start;
+    let prev = null;
+    others.forEach(r => {
+      if (r.ans[id] === undefined) return;
+      const pt = (r.at && r.at[id]) || r.start;
+      if (pt < t && (!prev || pt > prev[0])) prev = [pt, grade(BYID[id], r.ans[id]).full];
+    });
+    return prev && !prev[1];
+  }).length;
+}
+/* Bestwerte je Probeklausur und Originalklausur (nur vollständige Durchgänge oder Klausur-Modus) */
+function runKey(r) {
+  if (r.key !== undefined) return r.key;
+  if (r.tab === 'mix') {
+    if (r.title === 'Probeklausur') return 'probe';
+    const y = Object.keys(EXAM).find(y => r.title === `Klausur ${EXAM[y]}`);
+    if (y) return 'y' + y;
+  }
+  return null;
+}
+function qualifies(r) { const s = runStats(r); return r.exam || s.answered === s.total; }
+function best(key, before) {
+  let b = null;
+  DB.done.forEach(r => {
+    if (runKey(r) !== key || !qualifies(r) || (before && (r.end || 0) >= before)) return;
+    const p = pctOf(r);
+    if (b === null || p > b) b = p;
+  });
+  return b;
+}
+const bestTxt = key => { const b = best(key); return b === null ? '' : `Best ${b} %`; };
+
+/* ---------- Abzeichen ---------- */
+const BADGES = [
+  ['seen', 'Alle 108 gesehen', 'Jede Frage mindestens einmal beantwortet'],
+  ['m_pers', 'Persönlichkeit gemeistert', 'Alle 36 Fragen auf Stufe „gemeistert“'],
+  ['m_entw', 'Entwicklung gemeistert', 'Alle 36 Fragen auf Stufe „gemeistert“'],
+  ['m_diag', 'Diagnostik gemeistert', 'Alle 36 Fragen auf Stufe „gemeistert“'],
+  ['exams', 'Jede Originalklausur bestanden', '2020, 2021 und 2022 je einmal vollständig mit mind. 60 %'],
+  ['probe80', 'Probeklausur über 80 %', 'Eine vollständige Probeklausur mit mehr als 80 %'],
+  ['exam', 'Klausur-Modus bestanden', 'Eine Prüfung unter Zeitlimit mit mind. 60 %'],
+  ['streak7', '7 Lerntage in Folge', 'Mit höchstens einem Pausetag pro Woche'],
+  ['goal5', 'Tagesziel an 5 Tagen', 'Fünfmal das Tagesziel erreicht'],
+  ['resc10', '10 Fragen gerettet', 'Zehnmal eine zuvor falsche Frage richtig beantwortet'],
+];
+function badgeState() {
+  const h = H();
+  const passKey = k => DB.done.some(r => runKey(r) === k && qualifies(r) && runStats(r).pass);
+  const all36 = f => ofFach(f).every(id => lvl(id) === 3);
+  return {
+    seen: QUESTIONS.every(q => h.q[q.id]),
+    m_pers: all36('pers'), m_entw: all36('entw'), m_diag: all36('diag'),
+    exams: [2020, 2021, 2022].every(y => passKey('y' + y)),
+    probe80: DB.done.some(r => runKey(r) === 'probe' && qualifies(r) && pctOf(r) > 80),
+    exam: DB.done.some(r => r.exam && runStats(r).pass),
+    streak7: streakNow() >= 7,
+    goal5: Object.values(h.days).filter(n => n >= DB.set.goal).length >= 5,
+    resc10: h.resc >= 10,
+  };
+}
+function checkBadges() {
+  const st = badgeState();
+  const neu = [];
+  BADGES.forEach(([id, name]) => { if (st[id] && !DB.badges[id]) { DB.badges[id] = Date.now(); neu.push(name); } });
+  if (neu.length) { save(); toast('Abzeichen erreicht: ' + neu.join(', ')); }
+}
+let toastT = 0;
+function toast(msg) {
+  let el = document.getElementById('toast');
+  if (!el) { el = document.createElement('div'); el.id = 'toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 3800);
 }
 
 /* ---------- Versuche ---------- */
-function startRun(tab, title, ids) {
+function startRun(tab, title, ids, extra) {
   finishOpen(tab);
-  DB.open[tab] = { id: 'r' + Date.now().toString(36), tab, title, ids, ans: {}, at: {}, pos: 0, start: Date.now() };
+  DB.open[tab] = Object.assign({ id: 'r' + Date.now().toString(36), tab, title, ids, ans: {}, at: {}, pos: 0, start: Date.now() }, extra || {});
   save();
   pick = new Set();
   go('#quiz/' + tab);
 }
-/* Offenen Versuch abschließen: mit Antworten → Versuche, ohne → verwerfen */
-function finishOpen(tab) {
+/* Offenen Versuch abschließen: mit Antworten → Versuche, ohne → verwerfen (Klausur-Modus wird immer abgegeben) */
+function finishOpen(tab, timeout) {
   const r = DB.open[tab];
   if (!r) return null;
   delete DB.open[tab];
-  if (Object.keys(r.ans).length) {
-    r.end = Date.now();
+  if (Object.keys(r.ans).length || r.exam) {
+    r.end = r.exam ? Math.min(Date.now(), r.start + r.limit) : Date.now();
+    if (timeout) r.timeout = true;
     DB.done.push(r);
     save();
     return r;
@@ -112,6 +258,7 @@ function finishOpen(tab) {
   save();
   return null;
 }
+const examLeft = r => r.limit - (Date.now() - r.start);
 
 /* ---------- Ansichten ---------- */
 const view = document.getElementById('view');
@@ -119,6 +266,7 @@ const tabsEl = document.getElementById('tabs');
 let pick = new Set();
 let openDetail = null;
 let delArmed = false;
+let subArmed = false;
 
 /* Tab-Leiste: einmal aufbauen, danach nur Klassen und Hinterlegung umstellen (damit es gleitet) */
 function buildTabs() {
@@ -157,6 +305,13 @@ function resumeCard(tab) {
   const r = DB.open[tab];
   if (!r) return '';
   const s = runStats(r);
+  if (r.exam) {
+    return `<div class="label">Klausur läuft</div><div class="resume exam">
+    <div class="t">${esc(r.title)}</div>
+    <div class="d">${s.answered} von ${s.total} beantwortet · noch <span data-left>${fmtDur(examLeft(r))}</span> Min.</div>
+    <div class="bar"><i data-w="${Math.round(100 * s.answered / s.total)}"></i></div>
+    <div class="btns"><button class="btn primary" data-act="resume" data-tab="exam">Fortsetzen</button></div></div>`;
+  }
   const pct = Math.round(100 * s.answered / s.total);
   return `<div class="label">Laufender Versuch</div><div class="resume">
     <div class="t">${esc(r.title)}</div>
@@ -167,15 +322,51 @@ function resumeCard(tab) {
     <button class="btn plain" data-act="discard" data-tab="${tab}">Verwerfen</button></div></div>`;
 }
 
+/* Kopf von Gemischt: Tagesziel, Lerntage-Kette, Countdown */
+function todayCard() {
+  const h = H(), goal = DB.set.goal, n = h.days[dayKey(Date.now())] || 0, reached = n >= goal;
+  const C = 2 * Math.PI * 20, f = Math.min(1, n / goal) * C;
+  const st = streakNow();
+  const WD = ['S', 'M', 'D', 'M', 'D', 'F', 'S'];
+  let week = '';
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - i);
+    week += `<span class="wd ${h.days[dayKey(d)] ? 'on' : ''} ${i === 0 ? 'now' : ''}"><i></i>${WD[d.getDay()]}</span>`;
+  }
+  let hc = `<div class="today"><div class="top">` +
+    `<div class="ring ${reached ? 'ok' : ''}"><svg viewBox="0 0 48 48" aria-hidden="true"><circle class="rb" cx="24" cy="24" r="20"/>` +
+    (n ? `<circle class="rf" cx="24" cy="24" r="20" stroke-dasharray="${f.toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 24 24)"/>` : '') + `</svg>` +
+    `<span>${Math.min(n, 999)}</span></div>` +
+    `<div class="tx"><b>${reached ? 'Tagesziel erreicht' : `Heute ${n} von ${goal} Fragen`}</b>` +
+    `<span>${st === 0 ? 'Noch keine Lerntage-Kette' : st === 1 ? '1 Lerntag in Folge' : `${st} Lerntage in Folge`}</span>` +
+    `<div class="week">${week}</div></div></div>`;
+  const ed = DB.set.examDate;
+  const days = ed ? dayNum(ed) - h.today : null;
+  if (ed && days >= 0) {
+    const notSure = QUESTIONS.filter(q => lvl(q.id) < 2).length;
+    let line;
+    if (days === 0) line = 'Heute ist Klausur – viel Erfolg!';
+    else line = `Noch <b>${days} ${days === 1 ? 'Tag' : 'Tage'}</b> bis zur Klausur` +
+      (notSure ? ` · ${notSure} Fragen noch nicht sicher → ca. ${Math.ceil(notSure / days)} am Tag` : ' · alle Fragen mindestens sicher');
+    hc += `<div class="cd">${line}</div>`;
+  } else {
+    hc += `<button class="cd link" data-act="settings">${ed ? 'Klausurdatum liegt in der Vergangenheit – ändern' : 'Klausurdatum festlegen'} ›</button>`;
+  }
+  return hc + `</div>`;
+}
+
 function fachView(f) {
   const ids = ofFach(f);
   const last = lastStatus();
   const seen = ids.filter(id => last[id]);
   const ok = seen.filter(id => last[id].full).length;
   const wrong = seen.length - ok;
+  const due = ids.filter(isDue).length;
+  const mast = ids.filter(id => lvl(id) === 3).length;
   let h = gearBtn() + `<h1>${FACH[f]}</h1><p class="sub">36 Fragen aus den Klausuren 2020–2022 · 1–4 Antworten richtig</p>`;
   h += resumeCard(f);
   h += `<div class="label">Abfragen</div><div class="list">`;
+  h += row('start', 'Heute fällig', due ? 'Wiederholung nach Plan' : 'Für heute ist alles wiederholt', String(due), `data-tab="${f}" data-kind="due" ${due ? '' : 'disabled'}`);
   h += row('start', 'Alle 36 Fragen', 'Reihenfolge wie in den Klausuren', '', `data-tab="${f}" data-kind="all"`);
   h += row('start', 'Alle 36 Fragen gemischt', 'Zufällige Reihenfolge', '', `data-tab="${f}" data-kind="shuf"`);
   h += row('start', '12 zufällige Fragen', 'Kurze Runde', '', `data-tab="${f}" data-kind="r12"`);
@@ -185,7 +376,7 @@ function fachView(f) {
   [2020, 2021, 2022].forEach(y => {
     h += row('start', `Klausur ${EXAM[y]}`, '', '12', `data-tab="${f}" data-kind="y${y}"`);
   });
-  h += `</div><p class="foot">Stand: ${ok} von 36 zuletzt vollständig richtig.</p>`;
+  h += `</div><p class="foot">Stand: ${ok} von 36 zuletzt vollständig richtig · ${mast} gemeistert.</p>`;
   return h;
 }
 
@@ -193,16 +384,26 @@ function mixView() {
   const last = lastStatus();
   const wrong = QUESTIONS.filter(q => last[q.id] && !last[q.id].full).length;
   const ok = QUESTIONS.filter(q => last[q.id] && last[q.id].full).length;
+  const due = QUESTIONS.filter(q => isDue(q.id)).length;
+  const exOpen = !!DB.open.exam;
   let h = gearBtn() + `<h1>Gemischt</h1><p class="sub">Alle drei Bereiche · ${ok} von 108 zuletzt vollständig richtig</p>`;
-  h += resumeCard('mix');
+  h += todayCard();
+  h += resumeCard('exam') + resumeCard('mix');
   h += `<div class="label">Abfragen</div><div class="list">`;
-  h += row('start', 'Probeklausur', '36 Fragen, je 12 pro Bereich, zufällig', '', 'data-tab="mix" data-kind="probe"');
+  h += row('start', 'Heute fällig', due ? 'Wiederholung nach Plan, alle Bereiche' : 'Für heute ist alles wiederholt', String(due), `data-tab="mix" data-kind="due" ${due ? '' : 'disabled'}`);
+  h += row('start', 'Probeklausur', '36 Fragen, je 12 pro Bereich, zufällig', bestTxt('probe'), 'data-tab="mix" data-kind="probe"');
   h += row('start', 'Alle 108 Fragen gemischt', '', '', 'data-tab="mix" data-kind="shuf"');
   h += row('start', '20 zufällige Fragen', 'Kurze Runde', '', 'data-tab="mix" data-kind="r20"');
   h += row('start', 'Bisher Falsche', 'Aus allen Bereichen', String(wrong), `data-tab="mix" data-kind="wrong" ${wrong ? '' : 'disabled'}`);
-  h += `</div><div class="label">Originalklausuren</div><div class="list">`;
+  h += `</div><div class="label">Klausur-Modus · ${EXAM_MIN} Minuten</div><div class="list">`;
+  h += row('start', 'Probeklausur als Prüfung', '36 Fragen · Auflösung erst nach dem Abgeben', '', `data-tab="exam" data-kind="probe" ${exOpen ? 'disabled' : ''}`);
   [2020, 2021, 2022].forEach(y => {
-    h += row('start', `Klausur ${EXAM[y]}`, 'Alle 36 Fragen in Originalreihenfolge', '', `data-tab="mix" data-kind="y${y}"`);
+    h += row('start', `Klausur ${EXAM[y]} als Prüfung`, 'Originalreihenfolge', bestTxt('y' + y), `data-tab="exam" data-kind="y${y}" ${exOpen ? 'disabled' : ''}`);
+  });
+  h += `</div><p class="foot">${exOpen ? 'Es läuft schon eine Prüfung – erst abgeben, dann neu starten.' : 'Läuft wie die echte Klausur: Zeit läuft, nichts wird zwischendurch aufgelöst.'}</p>`;
+  h += `<div class="label">Originalklausuren</div><div class="list">`;
+  [2020, 2021, 2022].forEach(y => {
+    h += row('start', `Klausur ${EXAM[y]}`, 'Alle 36 Fragen in Originalreihenfolge', bestTxt('y' + y), `data-tab="mix" data-kind="y${y}"`);
   });
   h += `</div>`;
   return h;
@@ -212,22 +413,24 @@ function buildIds(tab, kind) {
   const pool = tab === 'mix' ? QUESTIONS.map(q => q.id) : ofFach(tab);
   const last = lastStatus();
   const name = tab === 'mix' ? 'Gemischt' : FACH[tab];
-  if (kind === 'all') return [pool, `${name} · alle 36`];
-  if (kind === 'shuf') return [shuffle(pool), `${name} · alle gemischt`];
-  if (kind === 'r12') return [shuffle(pool).slice(0, 12), `${name} · 12 zufällige`];
-  if (kind === 'r20') return [shuffle(pool).slice(0, 20), 'Gemischt · 20 zufällige'];
-  if (kind === 'wrong') return [shuffle(pool.filter(id => last[id] && !last[id].full)), `${name} · bisher Falsche`];
-  if (kind === 'new') return [pool.filter(id => !last[id]), `${name} · noch nie beantwortet`];
+  const R = (ids, title, key = null) => ({ ids, title, key });
+  if (kind === 'due') return R(shuffle(pool.filter(isDue)), `${name} · heute fällig`);
+  if (kind === 'all') return R(pool, `${name} · alle 36`);
+  if (kind === 'shuf') return R(shuffle(pool), `${name} · alle gemischt`);
+  if (kind === 'r12') return R(shuffle(pool).slice(0, 12), `${name} · 12 zufällige`);
+  if (kind === 'r20') return R(shuffle(pool).slice(0, 20), 'Gemischt · 20 zufällige');
+  if (kind === 'wrong') return R(shuffle(pool.filter(id => last[id] && !last[id].full)), `${name} · bisher Falsche`);
+  if (kind === 'new') return R(pool.filter(id => !last[id]), `${name} · noch nie beantwortet`);
   if (kind === 'probe') {
     const ids = [].concat(...Object.keys(FACH).map(f => shuffle(ofFach(f)).slice(0, 12)));
-    return [shuffle(ids), 'Probeklausur'];
+    return R(shuffle(ids), 'Probeklausur', 'probe');
   }
   if (kind[0] === 'y') {
     const y = +kind.slice(1);
     const ids = pool.filter(id => BYID[id].y === y).sort((a, b) => BYID[a].n - BYID[b].n);
-    return [ids, tab === 'mix' ? `Klausur ${EXAM[y]}` : `${name} · Klausur ${EXAM[y]}`];
+    return tab === 'mix' ? R(ids, `Klausur ${EXAM[y]}`, 'y' + y) : R(ids, `${name} · Klausur ${EXAM[y]}`);
   }
-  return [pool, name];
+  return R(pool, name);
 }
 
 function quizView(tab) {
@@ -261,7 +464,7 @@ function quizView(tab) {
     const g = grade(q, a);
     h += `<div class="verdict ${g.full ? 'ok' : 'bad'}">${g.full ? 'Vollständig richtig' : `Nicht ganz: ${g.n} von 4 Aussagen richtig behandelt`} · ${g.pts} von 4 Punkten` +
       `${q.m.includes('UNSICHER') ? ' (unter Vorbehalt)' : ''}</div>`;
-    h += `<div class="legend">Schlüssel: ${q.k} · Deine Kreuze: ${a || 'keine'}</div>`;
+    h += `<div class="legend">Schlüssel: ${q.k} · Deine Kreuze: ${a || 'keine'} · Stufe: ${LVL[lvl(q.id)]}</div>`;
     h += `<div class="topic">Thema: ${esc(q.t)}</div>`;
     if (q.h.length) {
       h += `<div class="hints">` + q.h.map(([t, msg]) => `<div><b>${MARK[t] || esc(t)}</b>${esc(msg)}</div>`).join('') + `</div>`;
@@ -277,14 +480,72 @@ function quizView(tab) {
   return h;
 }
 
+/* ---------- Klausur-Modus ---------- */
+const GRID_ICO = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>';
+function timerHtml(r) {
+  return `<span class="timer ${examLeft(r) < 600000 ? 'low' : ''}" data-timer><span data-el>${fmtDur(Date.now() - r.start)}</span><small> / ${EXAM_MIN}:00</small></span>`;
+}
+function examTop(r, right) {
+  return `<div class="qtop"><div class="line"><button class="back" data-act="leave" data-tab="exam">‹ Gemischt</button>` +
+    timerHtml(r) + `<span class="count">${right}</span></div>` +
+    `<div class="bar"><i data-w="${Math.round(100 * Object.keys(r.ans).length / r.ids.length)}"></i></div></div>`;
+}
+function examView() {
+  const r = DB.open.exam;
+  if (r.pos >= r.ids.length) r.pos = r.ids.length - 1;
+  const q = BYID[r.ids[r.pos]];
+  const a = r.ans[q.id] || '';
+  const fl = !!r.flag[q.id];
+  let h = examTop(r, `${r.pos + 1} / ${r.ids.length}`);
+  h += `<div class="meta">Frage ${r.pos + 1} · ${FACH[q.f]}</div>`;
+  if (q.m.includes('FRAGESATZ_FEHLT')) h += `<div class="note"><b>Fragesatz fehlt.</b> In der Vorlage ist nur die Fallbeschreibung übertragen, der eigentliche Fragesatz fehlt.</div>`;
+  h += `<div class="qtext">${esc(q.q)}</div><div class="hint1">1–4 Antworten richtig</div><div class="opts">`;
+  LETTERS.forEach((L, i) => {
+    const on = a.includes(L);
+    h += `<button class="opt ${on ? 'on' : ''}" data-act="xpick" data-l="${L}" aria-pressed="${on}"><span class="let">${L}</span><span class="ot">${esc(q.o[i])}</span></button>`;
+  });
+  h += `</div><button class="flagbtn ${fl ? 'on' : ''}" data-act="flag" aria-pressed="${fl}"><span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 12.5 4 4 8-9"/></svg></span>Unsicher – später nochmal ansehen</button>`;
+  h += `<p class="foot">${r.ans[q.id] === undefined ? 'Noch nicht beantwortet.' : 'Antwort gespeichert – du kannst sie bis zum Abgeben ändern.'}</p>`;
+  const last = r.pos === r.ids.length - 1;
+  h += `<div class="action"><div class="in">`;
+  if (r.pos > 0) h += `<button class="btn plain" data-act="xprev">Zurück</button>`;
+  if (r.seenGrid) h += `<button class="btn plain icon" data-act="grid" aria-label="Gesamtansicht">${GRID_ICO}</button>`;
+  h += last ? `<button class="btn primary" data-act="grid">Zur Übersicht</button>` : `<button class="btn primary" data-act="xnext">Weiter</button>`;
+  h += `</div></div>`;
+  return h;
+}
+function gridView() {
+  const r = DB.open.exam;
+  if (!r.seenGrid) { r.seenGrid = true; save(); }
+  const answered = Object.keys(r.ans).length, open = r.ids.length - answered;
+  const flagged = r.ids.filter(id => r.flag[id]).length;
+  let h = examTop(r, `${answered} / ${r.ids.length}`);
+  h += `<h1>Übersicht</h1><p class="sub">${answered} von ${r.ids.length} beantwortet` + (flagged ? ` · ${flagged} als unsicher markiert` : '') + `</p>`;
+  h += `<div class="tiles">` + r.ids.map((id, i) =>
+    `<button class="tile ${r.ans[id] !== undefined ? 'ans' : ''} ${r.flag[id] ? 'flag' : ''} ${i === r.pos ? 'cur' : ''}" data-act="jump" data-i="${i}" aria-label="Frage ${i + 1}">${i + 1}</button>`).join('') + `</div>`;
+  h += `<div class="tlegend"><span><i class="ans"></i>Beantwortet</span><span><i></i>Offen</span><span><i class="flag"></i>Unsicher</span></div>`;
+  h += `<p class="foot">Antippen springt zur Frage. Unbeantwortete Fragen zählen beim Abgeben 0 Punkte.</p>`;
+  h += `<div class="action"><div class="in"><button class="btn primary ${subArmed ? 'armed' : ''}" data-act="submit">` +
+    (subArmed ? 'Wirklich abgeben? Nochmal tippen' : open ? `Abgeben (${open} offen)` : 'Abgeben') + `</button></div></div>`;
+  return h;
+}
+
 function resultList(run, withDetail) {
-  const s = runStats(run);
-  return s.ids.map(id => {
-    const q = BYID[id], a = run.ans[id], g = grade(q, a);
+  const ids = run.exam ? run.ids : runStats(run).ids;
+  return ids.map(id => {
+    const q = BYID[id], a = run.ans[id];
+    const flg = run.flag && run.flag[id] ? ' · als unsicher markiert' : '';
+    if (a === undefined) {
+      return `<button class="row" data-act="toggle" data-id="${id}"><span class="dot"></span><span class="main">` +
+        `<span class="t">${q.y} · Frage ${q.n} · ${FACH[q.f]}</span><span class="d">Nicht beantwortet${flg}</span></span><span class="v">0 P.</span></button>` +
+        (withDetail && openDetail === id ? `<div class="detail"><p>${esc(q.q)}</p><ul>` + LETTERS.map((L, i) =>
+          `<li class="${q.k.includes(L) ? 'good' : ''}">${L}) ${esc(q.o[i])} – ${q.k.includes(L) ? 'richtig' : 'falsch'}</li>`).join('') + `</ul></div>` : '');
+    }
+    const g = grade(q, a);
     const uns = q.m.includes('UNSICHER');
     const cls = g.full ? (uns ? 'warn' : 'ok') : 'bad';
     let h = `<button class="row" data-act="toggle" data-id="${id}"><span class="dot ${cls}"></span><span class="main">` +
-      `<span class="t">${q.y} · Frage ${q.n} · ${FACH[q.f]}</span><span class="d">${esc(q.t)}</span></span>` +
+      `<span class="t">${q.y} · Frage ${q.n} · ${FACH[q.f]}</span><span class="d">${esc(q.t)}${flg}</span></span>` +
       `<span class="v">${g.pts} P.</span></button>`;
     if (withDetail && openDetail === id) {
       h += `<div class="detail"><p>${esc(q.q)}</p><ul>` + LETTERS.map((L, i) => {
@@ -303,10 +564,21 @@ function summaryView(run, fromHist) {
   let h = fromHist ? `<div class="qtop"><div class="line"><button class="back" data-act="gohist">‹ Versuche</button><span></span></div></div>` : '';
   h += `<div class="big">${s.pts}<small> / ${s.max} Punkte</small></div>`;
   h += `<div class="pass ${s.pass ? 'ok' : 'bad'}">${s.pass ? 'Bestanden' : 'Nicht bestanden'} · ${pct} %</div>`;
-  h += `<p class="sub">Bestanden ab 60 % (${need} Punkte) · ${s.full} von ${s.answered} Fragen vollständig richtig` +
-    (s.answered < s.total ? ` · ${s.total - s.answered} Fragen nicht beantwortet` : '') + `</p>`;
+  const key = runKey(run);
+  if (key && qualifies(run)) {
+    const prev = best(key, run.end || Date.now());
+    if (prev === null) h += `<div class="pass best">Erster Durchgang · Bestwert ${pct} %</div>`;
+    else if (pct > prev) h += `<div class="pass best">Neuer Bestwert · vorher ${prev} %</div>`;
+  }
+  h += `<p class="sub">Bestanden ab 60 % (${need} Punkte) · ${s.full} von ${run.exam ? s.total : s.answered} Fragen vollständig richtig` +
+    (s.answered < s.total ? ` · ${s.total - s.answered} Fragen nicht beantwortet${run.exam ? ' (0 Punkte)' : ''}` : '') + `</p>`;
+  const resc = rescuedIn(run);
+  let meta = fmtDate(run.start);
+  if (run.exam) meta += run.timeout ? ` · Zeit abgelaufen, automatisch abgegeben` : ` · Zeit ${fmtDur((run.end || Date.now()) - run.start)} von ${EXAM_MIN}:00`;
   h += `<div class="list"><div class="row"><span class="main"><span class="t">${esc(run.title)}</span>` +
-    `<span class="d">${fmtDate(run.start)}</span></span></div></div>`;
+    `<span class="d">${meta}</span></span></div>` +
+    (resc ? `<div class="row"><span class="main"><span class="t okc">${resc} ${resc === 1 ? 'Frage' : 'Fragen'} gerettet</span><span class="d">Letztes Mal falsch, diesmal vollständig richtig</span></span></div>` : '') +
+    `</div>`;
   if (s.unsure.length) h += `<p class="foot">Unter Vorbehalt (Schlüssel unsicher): ${s.unsure.map(id => `${BYID[id].y} · Frage ${BYID[id].n}`).join(', ')}</p>`;
   h += `<div class="label">Fragen</div><div class="list">${resultList(run, true)}</div>`;
   h += `<p class="foot">Antippen zeigt die Aussagen mit Schlüssel und deinen Kreuzen.</p>`;
@@ -326,7 +598,13 @@ function newer(a, b) {
   return false;
 }
 function setView() {
-  let h = `<div class="topbar"><button class="back" data-act="setback"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>Zurück</button><span></span></div><h1>Einstellungen</h1><p class="sub">Darstellung und App-Version</p>`;
+  let h = `<div class="topbar"><button class="back" data-act="setback"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>Zurück</button><span></span></div><h1>Einstellungen</h1><p class="sub">Lernen, Darstellung und App-Version</p>`;
+  h += `<div class="label">Lernen</div><div class="list"><div class="row"><span class="main"><span class="t">Tagesziel</span><span class="d">Fragen pro Tag</span></span></div>` +
+    `<div class="seg" role="radiogroup">` + GOALS.map(g => `<button data-act="goal" data-g="${g}" role="radio" aria-checked="${DB.set.goal === g}" class="${DB.set.goal === g ? 'on' : ''}">${g}</button>`).join('') + `</div>` +
+    `<label class="row"><span class="main"><span class="t">Klausurdatum</span><span class="d">Für den Countdown auf Gemischt</span></span>` +
+    `<input type="date" class="date" data-in="examdate" value="${DB.set.examDate || ''}"></label>` +
+    (DB.set.examDate ? `<button class="row danger" data-act="clrdate"><span class="main"><span class="t">Datum entfernen</span></span></button>` : '') +
+    `</div><p class="foot">Lerntage zählen, sobald du an einem Tag mindestens eine Frage beantwortest. Ein Pausetag pro Woche unterbricht die Kette nicht.</p>`;
   h += `<div class="label">Darstellung</div><div class="list"><div class="seg" role="radiogroup">` +
     Object.keys(THEMES).map(t => `<button data-act="theme" data-t="${t}" role="radio" aria-checked="${DB.set.theme === t}" class="${DB.set.theme === t ? 'on' : ''}">${t === 'system' ? 'System' : THEMES[t]}</button>`).join('') +
     `</div></div><p class="foot">„System“ folgt der Einstellung deines iPhones.</p>`;
@@ -351,7 +629,7 @@ async function checkUpdate() {
   } catch (e) {
     upd = { st: 'offline', remote: null, at: upd.at };
   }
-  if ((location.hash.slice(1) || 'home') === 'set') render();
+  if (location.hash.slice(1) === 'set') render();
 }
 async function applyUpdate() {
   try {
@@ -363,14 +641,27 @@ async function applyUpdate() {
   location.replace('./?u=' + Date.now() + '#set');
 }
 
+function mosaic() {
+  let h = `<div class="mosaic">`;
+  Object.keys(FACH).forEach(f => {
+    const ids = ofFach(f);
+    const m = ids.filter(id => lvl(id) === 3).length;
+    h += `<div class="mblock"><div class="mh"><span>${FACH[f]}</span><span>${m} / 36 gemeistert</span></div><div class="mgrid">` +
+      ids.map(id => `<i class="l${lvl(id)}" title="${BYID[id].y} · Frage ${BYID[id].n}: ${LVL[lvl(id)]}"></i>`).join('') + `</div></div>`;
+  });
+  return h + `<div class="mlegend">` + LVL.map((n, i) => `<span><i class="l${i}"></i>${n}</span>`).join('') + `</div></div>`;
+}
+
 function histView() {
   const last = lastStatus();
-  let h = gearBtn() + `<h1>Versuche</h1><p class="sub">Abgeschlossene Abfragen, neueste zuerst</p>`;
+  let h = gearBtn() + `<h1>Versuche</h1><p class="sub">Fortschritt, Abzeichen und abgeschlossene Abfragen</p>`;
   h += `<div class="stats">` + Object.keys(FACH).map(f => {
     const ids = ofFach(f);
     const ok = ids.filter(id => last[id] && last[id].full).length;
     return `<div class="stat"><b>${ok}<span> / 36</span></b><span>${FACH[f]}</span></div>`;
   }).join('') + `</div><p class="foot">Zuletzt vollständig richtig beantwortet, je Bereich.</p>`;
+  h += `<div class="label">Fortschritt je Frage</div>` + mosaic();
+  h += `<p class="foot">Gemeistert heißt: an drei verschiedenen Tagen richtig, ohne Fehler dazwischen. Ein Fehler setzt die Frage auf „gesehen“ zurück.</p>`;
   const open = Object.values(DB.open);
   if (open.length) {
     h += `<div class="label">Noch offen</div><div class="list">` + open.map(r => {
@@ -379,11 +670,19 @@ function histView() {
     }).join('') + `</div>`;
   }
   h += `<div class="label">Abgeschlossen</div>`;
-  if (!DB.done.length) return h + `<div class="list"><div class="empty">Noch keine abgeschlossenen Versuche.</div></div>`;
-  h += `<div class="list">` + DB.done.slice().reverse().map(r => {
-    const s = runStats(r);
-    const pc = s.max ? Math.round(100 * s.pts / s.max) : 0;
-    return row('openrun', esc(r.title), `${fmtDate(r.start)} · ${s.pts}/${s.max} Punkte`, `<span class="${s.pass ? 'okc' : 'badc'}">${pc} %</span>`, `data-run="${r.id}"`);
+  if (!DB.done.length) h += `<div class="list"><div class="empty">Noch keine abgeschlossenen Versuche.</div></div>`;
+  else {
+    h += `<div class="list">` + DB.done.slice().reverse().map(r => {
+      const s = runStats(r);
+      const pc = s.max ? Math.round(100 * s.pts / s.max) : 0;
+      return row('openrun', esc(r.title), `${fmtDate(r.start)} · ${s.pts}/${s.max} Punkte`, `<span class="${s.pass ? 'okc' : 'badc'}">${pc} %</span>`, `data-run="${r.id}"`);
+    }).join('') + `</div>`;
+  }
+  const got = BADGES.filter(b => DB.badges[b[0]]).length;
+  h += `<div class="label">Abzeichen · ${got} von ${BADGES.length}</div><div class="list">` + BADGES.map(([id, name, desc]) => {
+    const t = DB.badges[id];
+    return `<div class="row badge ${t ? 'got' : ''}"><span class="medal"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9.5" r="5.5"/><path d="m8.8 14 -1.8 6.5 5-2.5 5 2.5-1.8-6.5"/></svg></span>` +
+      `<span class="main"><span class="t">${name}</span><span class="d">${t ? 'Erreicht am ' + fmtDay(t) : desc}</span></span></div>`;
   }).join('') + `</div>`;
   return h;
 }
@@ -394,25 +693,32 @@ function go(hash) {
 }
 let prevTab = null, first = true, setFrom = 'mix';
 function render() {
+  if (DB.open.exam && examLeft(DB.open.exam) <= 0) {
+    const d = finishOpen('exam', true);
+    if (/^#(quiz|grid)\/exam/.test(location.hash)) { location.replace('#sum/' + d.id); }
+  }
+  checkBadges();
   let hash = location.hash.slice(1) || 'mix';
   if (hash === 'home') hash = 'mix';
   const [a, b] = hash.split('/');
   let html = null, tab = a, quiz = false;
-  if (a === 'quiz' && DB.open[b]) { html = quizView(b); tab = b; quiz = true; }
+  if (a === 'quiz' && b === 'exam' && DB.open.exam) { html = examView(); tab = 'exam'; quiz = true; }
+  else if (a === 'grid' && b === 'exam' && DB.open.exam) { html = gridView(); tab = 'exam'; quiz = true; }
+  else if (a === 'quiz' && DB.open[b]) { html = quizView(b); tab = b; quiz = true; }
   else if (a === 'sum' || a === 'run') {
     const r = DB.done.find(x => x.id === b);
     if (r) { html = summaryView(r, a === 'run'); tab = a === 'run' ? 'hist' : r.tab; quiz = a === 'sum'; }
   }
   const isSet = a === 'set' && html === null;
   if (html === null) {
-    if (a === 'quiz') tab = b;
+    if (a === 'quiz' || a === 'grid') tab = b;
     if (isSet) tab = 'set';
     else if (!ORDER.includes(tab)) tab = 'mix';
     html = isSet ? setView() : tab === 'hist' ? histView() : tab === 'mix' ? mixView() : fachView(tab);
   }
   if (FACH[tab] && !quiz && DB.set.fach !== tab) { DB.set.fach = tab; save(); }
-  /* Farbhauch: Einstellungen behalten den Hauch der Seite, von der man kommt */
-  document.documentElement.dataset.tab = isSet ? setFrom : tab;
+  /* Farbhauch: Einstellungen behalten den Hauch der Seite, von der man kommt; Klausur-Modus gehört zu Gemischt */
+  document.documentElement.dataset.tab = isSet ? setFrom : tab === 'exam' ? 'mix' : tab;
   document.body.classList.toggle('quiz', quiz);
   document.body.classList.toggle('set', isSet);
   document.body.classList.toggle('enter', first);
@@ -428,12 +734,31 @@ function render() {
   view.querySelectorAll('[data-w]').forEach(e => { e.style.width = e.dataset.w + '%'; });
 }
 
+/* Uhr für den Klausur-Modus: Anzeige jede Sekunde, bei Ablauf automatisch abgeben */
+setInterval(() => {
+  const r = DB.open.exam;
+  if (!r) return;
+  if (examLeft(r) <= 0) {
+    const onExam = /^#(quiz|grid)\/exam/.test(location.hash);
+    const d = finishOpen('exam', true);
+    if (onExam) go('#sum/' + d.id); else render();
+    toast('Zeit abgelaufen – Klausur automatisch abgegeben');
+    return;
+  }
+  document.querySelectorAll('[data-timer]').forEach(e => {
+    e.querySelector('[data-el]').textContent = fmtDur(Date.now() - r.start);
+    e.classList.toggle('low', examLeft(r) < 600000);
+  });
+  document.querySelectorAll('[data-left]').forEach(e => { e.textContent = fmtDur(examLeft(r)); });
+}, 1000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { HC = null; render(); } });
+
 let lastHash = '';
 let navT = 0;
 window.addEventListener('hashchange', () => {
   const h = location.hash;
   if (h !== lastHash) {
-    openDetail = null; delArmed = false; pick = new Set(); window.scrollTo(0, 0);
+    openDetail = null; delArmed = false; subArmed = false; pick = new Set(); window.scrollTo(0, 0);
     document.body.classList.add('nav');
     clearTimeout(navT); navT = setTimeout(() => document.body.classList.remove('nav'), 450);
   }
@@ -441,19 +766,27 @@ window.addEventListener('hashchange', () => {
   render();
 });
 
+view.addEventListener('change', e => {
+  if (e.target.dataset.in === 'examdate') { DB.set.examDate = e.target.value || null; save(); render(); }
+});
+
 view.addEventListener('click', e => {
   const el = e.target.closest('[data-act]');
   if (!el || el.disabled) return;
   const act = el.dataset.act, tab = el.dataset.tab;
   const r = tab ? DB.open[tab] : null;
+  const x = DB.open.exam;
   switch (act) {
     case 'start': {
-      const [ids, title] = buildIds(tab, el.dataset.kind);
-      if (ids.length) startRun(tab, title, ids);
+      const exam = tab === 'exam';
+      const b = buildIds(exam ? 'mix' : tab, el.dataset.kind);
+      if (!b.ids.length) break;
+      if (exam) startRun('exam', 'Prüfung · ' + b.title, b.ids, { key: b.key, exam: true, limit: EXAM_MIN * 60000, flag: {} });
+      else startRun(tab, b.title, b.ids, { key: b.key });
       break;
     }
     case 'resume': pick = new Set(); go('#quiz/' + tab); break;
-    case 'leave': go('#' + tab); break;
+    case 'leave': go('#' + (tab === 'exam' ? 'mix' : tab)); break;
     case 'discard': delete DB.open[tab]; save(); render(); break;
     case 'finish': {
       const done = finishOpen(tab);
@@ -483,23 +816,52 @@ view.addEventListener('click', e => {
       window.scrollTo(0, 0);
       break;
     }
+    /* Klausur-Modus */
+    case 'xpick': {
+      const id = x.ids[x.pos], L = el.dataset.l;
+      const cur = new Set((x.ans[id] || '').split(''));
+      if (cur.has(L)) cur.delete(L); else cur.add(L);
+      x.ans[id] = LETTERS.filter(k => cur.has(k)).join('');
+      x.at[id] = Date.now();
+      save(); render();
+      break;
+    }
+    case 'flag': {
+      const id = x.ids[x.pos];
+      if (x.flag[id]) delete x.flag[id]; else x.flag[id] = true;
+      save(); render();
+      break;
+    }
+    case 'xnext': case 'xprev': x.pos += act === 'xnext' ? 1 : -1; save(); render(); window.scrollTo(0, 0); break;
+    case 'grid': go('#grid/exam'); break;
+    case 'jump': x.pos = +el.dataset.i; save(); go('#quiz/exam'); break;
+    case 'submit': {
+      if (!subArmed) { subArmed = true; render(); break; }
+      subArmed = false;
+      const d = finishOpen('exam');
+      if (d) go('#sum/' + d.id);
+      break;
+    }
     case 'toggle': openDetail = openDetail === el.dataset.id ? null : el.dataset.id; render(); break;
     case 'gohist': go('#hist'); break;
-    case 'settings': setFrom = ORDER.includes(prevTab) ? prevTab : 'mix'; upd.st = upd.st === 'checking' ? upd.st : 'idle'; go('#set'); break;
+    case 'settings': setFrom = ORDER.includes(prevTab) ? prevTab : 'mix'; go('#set'); break;
     case 'setback': go('#' + setFrom); break;
+    case 'goal': DB.set.goal = +el.dataset.g; save(); render(); break;
+    case 'clrdate': DB.set.examDate = null; save(); render(); break;
     case 'theme': DB.set.theme = el.dataset.t; save(); applyTheme(DB.set.theme); render(); break;
     case 'updcheck': checkUpdate(); break;
     case 'updapply': applyUpdate(); break;
     case 'openrun': go('#run/' + el.dataset.run); break;
     case 'retry': {
-      const run = DB.done.find(x => x.id === el.dataset.run);
+      const run = DB.done.find(y => y.id === el.dataset.run);
       const s = runStats(run);
-      startRun(run.tab, 'Wiederholung: ' + run.title.replace(/^Wiederholung: /, ''), s.wrong);
+      const t = run.tab === 'exam' ? 'mix' : run.tab;
+      startRun(t, 'Wiederholung: ' + run.title.replace(/^Wiederholung: /, '').replace(/^Prüfung · /, ''), s.wrong);
       break;
     }
     case 'del': {
       if (!delArmed) { delArmed = true; render(); break; }
-      DB.done = DB.done.filter(x => x.id !== el.dataset.run);
+      DB.done = DB.done.filter(y => y.id !== el.dataset.run);
       save();
       go('#hist');
       break;

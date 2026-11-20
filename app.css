@@ -102,6 +102,8 @@
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; background: var(--bg); color: var(--text); }
+html { overflow-x: hidden; }
+body { overflow-x: clip; }
 body {
   font: 17px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
   -webkit-text-size-adjust: 100%;
@@ -381,3 +383,96 @@ button.row:active { background: var(--card2); }
 :root[data-tab="mix"] { --bg: var(--h-mix); }
 :root[data-tab="hist"] { --bg: var(--h-hist); }
 html, body, .qtop { transition: background-color .45s ease; }
+
+/* ---------- v1.6: Lernstand ---------- */
+/* Heute-Karte auf Gemischt */
+.today { background: var(--card); border: 1px solid var(--line); border-radius: 14px; margin-top: 4px; overflow: hidden; }
+.today .top { display: flex; gap: 14px; align-items: center; padding: 14px 16px; }
+.ring { position: relative; flex: 0 0 56px; height: 56px; }
+.ring svg { width: 56px; height: 56px; display: block; }
+.ring .rb { fill: none; stroke: var(--card2); stroke-width: 4.5; }
+.ring .rf { fill: none; stroke: var(--text); stroke-width: 4.5; stroke-linecap: round; transition: stroke-dasharray .6s ease; }
+.ring.ok .rf { stroke: var(--ok); }
+.ring span { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--serif); font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.today .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.today .tx b { font-weight: 600; font-size: 16px; }
+.today .tx > span { color: var(--muted); font-size: 14px; }
+.week { display: flex; gap: 6px; margin-top: 7px; }
+.wd { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: var(--muted); width: 18px; }
+.wd i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--letline); }
+.wd.on i { background: var(--text); border-color: var(--text); }
+.wd.now { color: var(--text); font-weight: 600; }
+.wd.now:not(.on) i { border-color: var(--text); }
+.today .cd { display: block; width: 100%; text-align: left; border-top: 1px solid var(--line); padding: 11px 16px; font-size: 14px; color: var(--muted); }
+.today .cd b { color: var(--text); font-weight: 600; }
+.today .cd.link { color: var(--text); }
+.today .cd.link:active { background: var(--card2); }
+
+/* Mosaik unter Versuche */
+.mosaic { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px 12px; }
+.mblock + .mblock { margin-top: 12px; }
+.mh { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.mh span:first-child { color: var(--text); font-weight: 500; }
+.mgrid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
+.mgrid i, .mlegend i { display: block; aspect-ratio: 1; border-radius: 3px; background: var(--card2); }
+.l1 { background: var(--badline) !important; }
+.l2 { background: var(--okline) !important; }
+.l3 { background: var(--ok) !important; }
+.mlegend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 12px; font-size: 12px; color: var(--muted); }
+.mlegend span { display: inline-flex; align-items: center; gap: 5px; }
+.mlegend i { width: 10px; }
+
+/* Abzeichen */
+.row.badge { opacity: .5; }
+.row.badge.got { opacity: 1; }
+.medal { flex: 0 0 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--card2); color: var(--muted); }
+.medal svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.row.badge.got .medal { background: var(--warnbg); color: var(--warn); }
+
+.pass.best { color: var(--warn); background: var(--warnbg); margin-left: 4px; }
+
+/* Einstellungen: Datum */
+.date { font: inherit; font-size: 16px; color: var(--text); background: var(--card2); border: 0; border-radius: 8px; padding: 6px 8px; min-width: 0; }
+label.row { cursor: pointer; }
+
+/* Klausur-Modus */
+.timer { font-variant-numeric: tabular-nums; font-size: 15px; font-weight: 600; background: var(--card2); border-radius: 999px; padding: 3px 10px; }
+.timer small { font-weight: 400; color: var(--muted); font-size: 13px; }
+.timer.low { color: var(--warn); background: var(--warnbg); }
+.flagbtn { display: inline-flex; align-items: center; gap: 10px; margin: 16px 2px 0; font-size: 15px; color: var(--muted); padding: 6px 0; }
+.flagbtn .box { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--letline); display: grid; place-items: center; }
+.flagbtn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+.flagbtn.on { color: var(--warn); }
+.flagbtn.on .box { background: var(--warn); border-color: var(--warn); color: #fff; }
+.flagbtn.on svg { opacity: 1; }
+.btn.icon { display: grid; place-items: center; padding: 12px 16px !important; }
+.btn.icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+.btn.armed { background: var(--bad) !important; color: #fff !important; }
+.tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 4px; }
+.tile {
+  aspect-ratio: 1; border-radius: 12px; display: grid; place-items: center; position: relative; overflow: hidden;
+  font-family: var(--serif); font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums;
+  background: var(--card); border: 1.5px dashed var(--letline); color: var(--muted);
+}
+.tile.ans { border: 1.5px solid var(--line); background: var(--sel); color: var(--text); }
+.tile.cur { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--text); }
+.tile.flag::after, .tlegend i.flag::after {
+  content: ""; position: absolute; top: 0; right: 0; width: 0; height: 0;
+  border-top: 14px solid var(--warn); border-left: 14px solid transparent;
+}
+.tile:active { transform: scale(.96); }
+.tlegend { display: flex; gap: 16px; flex-wrap: wrap; margin: 14px 4px 0; font-size: 13px; color: var(--muted); }
+.tlegend span { display: inline-flex; align-items: center; gap: 6px; }
+.tlegend i { position: relative; overflow: hidden; width: 16px; height: 16px; border-radius: 5px; border: 1.5px dashed var(--letline); background: var(--card); }
+.tlegend i.ans { border: 1.5px solid var(--line); background: var(--sel); }
+.tlegend i.flag::after { border-top-width: 8px; border-left-width: 8px; }
+.resume.exam { border-color: var(--warnbg); }
+
+/* Hinweis oben */
+#toast {
+  position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 12px); z-index: 30; max-width: calc(100% - 32px);
+  transform: translate(-50%, -20px); opacity: 0; pointer-events: none;
+  background: var(--text); color: var(--ontext); font-size: 14px; font-weight: 500; padding: 10px 16px; border-radius: 999px;
+  box-shadow: 0 8px 24px var(--shadow); transition: opacity .3s ease, transform .3s ease; text-align: center;
+}
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
