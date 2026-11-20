@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '1.0';
+const VERSION = '1.1';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
@@ -19,6 +19,8 @@ const ICON = {
   mix: '<path d="M4 7h3.5c4 0 5 10 9 10H20"/><path d="M4 17h3.5c1.6 0 2.7-1.6 3.6-3.5"/><path d="M13 10.5c.9-1.9 2-3.5 3.5-3.5H20"/><path d="m17.5 4.5 2.5 2.5-2.5 2.5"/><path d="m17.5 14.5 2.5 2.5-2.5 2.5"/>',
   hist: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
 };
+const COLOR = { pers: 'c-blue', entw: 'c-green', diag: 'c-orange', mix: 'c-purple', hist: 'c-gray' };
+const SUBT = { pers: 'Traits, Paradigmen, Faktorenanalyse', entw: 'Kognition, Jugendalter, Selbstkonzept', diag: 'Gütekriterien, Normen, Testtheorie', mix: 'Probeklausur und Originalklausuren', hist: 'Ergebnisse und Wiederholung' };
 const TABS = [
   ['pers', 'Persönlichkeit'], ['entw', 'Entwicklung'], ['diag', 'Diagnostik'],
   ['mix', 'Gemischt'], ['hist', 'Versuche'],
@@ -116,9 +118,41 @@ let openDetail = null;
 let delArmed = false;
 
 function renderTabs(active) {
-  tabsEl.innerHTML = TABS.map(([id, name]) =>
+  const i = TABS.findIndex(t => t[0] === active);
+  tabsEl.innerHTML = `<div class="pill"><span class="glow" data-i="${i}"></span>` + TABS.map(([id, name]) =>
     `<a href="#${id}" class="${id === active ? 'on' : ''}" ${id === active ? 'aria-current="page"' : ''}>` +
-    `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg>${name}</a>`).join('');
+    `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg><span>${name}</span></a>`).join('') + `</div>`;  const g = tabsEl.querySelector('.glow');
+  const from = lastTab >= 0 ? lastTab : i;
+  g.style.transform = `translateX(${from * 100}%)`;
+  if (from !== i) requestAnimationFrame(() => requestAnimationFrame(() => { g.style.transform = `translateX(${i * 100}%)`; }));
+  lastTab = i;
+}
+let lastTab = -1;
+const HOME = '<button class="homebtn" data-act="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>Übersicht</button>';
+
+function landingView() {
+  const last = lastStatus();
+  const total = QUESTIONS.filter(q => last[q.id] && last[q.id].full).length;
+  let h = `<header class="hero"><div class="eyebrow">Psychologie II · 2020–2022</div><h1 class="xl">Altklausuren</h1>` +
+    `<p class="sub">${total} von 108 Fragen zuletzt vollständig richtig</p><div class="bar big-bar"><i data-w="${Math.round(100 * total / 108)}"></i></div></header>`;
+  h += `<div class="cards">`;
+  TABS.forEach(([id, name], k) => {
+    let meta = '', pct = null;
+    if (FACH[id]) {
+      const ok = ofFach(id).filter(x => last[x] && last[x].full).length;
+      meta = `${ok} von 36 richtig`; pct = Math.round(100 * ok / 36);
+    } else if (id === 'mix') {
+      meta = '108 Fragen';
+    } else {
+      meta = DB.done.length === 1 ? '1 Versuch' : `${DB.done.length} Versuche`;
+    }
+    const open = DB.open[id] ? `<span class="badge">Läuft · ${runStats(DB.open[id]).answered}/${DB.open[id].ids.length}</span>` : '';
+    h += `<a class="card ${COLOR[id]}" href="#${id}" data-k="${k}"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg></span>` +
+      `<span class="ct"><span class="cn">${name}</span><span class="cs">${SUBT[id]}</span>` +
+      `<span class="cm">${meta}${open}</span>` + (pct !== null ? `<span class="bar"><i data-w="${pct}"></i></span>` : '') +
+      `</span><span class="chev">›</span></a>`;
+  });
+  return h + `</div><p class="foot center">Version ${VERSION} · Daten nur auf diesem Gerät</p>`;
 }
 
 function row(act, t, d, v, attrs = '') {
@@ -147,7 +181,7 @@ function fachView(f) {
   const seen = ids.filter(id => last[id]);
   const ok = seen.filter(id => last[id].full).length;
   const wrong = seen.length - ok;
-  let h = `<h1>${FACH[f]}</h1><p class="sub">36 Fragen aus den Klausuren 2020–2022 · 1–4 Antworten richtig</p>`;
+  let h = HOME + `<h1>${FACH[f]}</h1><p class="sub">36 Fragen aus den Klausuren 2020–2022 · 1–4 Antworten richtig</p>`;
   h += resumeCard(f);
   h += `<div class="label">Abfragen</div><div class="list">`;
   h += row('start', 'Alle 36 Fragen', 'Reihenfolge wie in den Klausuren', '', `data-tab="${f}" data-kind="all"`);
@@ -166,7 +200,7 @@ function fachView(f) {
 function mixView() {
   const last = lastStatus();
   const wrong = QUESTIONS.filter(q => last[q.id] && !last[q.id].full).length;
-  let h = `<h1>Gemischt</h1><p class="sub">Alle drei Bereiche · 108 Fragen</p>`;
+  let h = HOME + `<h1>Gemischt</h1><p class="sub">Alle drei Bereiche · 108 Fragen</p>`;
   h += resumeCard('mix');
   h += `<div class="label">Abfragen</div><div class="list">`;
   h += row('start', 'Probeklausur', '36 Fragen, je 12 pro Bereich, zufällig', '', 'data-tab="mix" data-kind="probe"');
@@ -291,7 +325,7 @@ function summaryView(run, fromHist) {
 
 function histView() {
   const last = lastStatus();
-  let h = `<h1>Versuche</h1><p class="sub">Abgeschlossene Abfragen, neueste zuerst</p>`;
+  let h = HOME + `<h1>Versuche</h1><p class="sub">Abgeschlossene Abfragen, neueste zuerst</p>`;
   h += `<div class="stats">` + Object.keys(FACH).map(f => {
     const ids = ofFach(f);
     const ok = ids.filter(id => last[id] && last[id].full).length;
@@ -317,8 +351,19 @@ function histView() {
 function go(hash) {
   if (location.hash === hash) render(); else location.hash = hash;
 }
+let prevHome = false;
 function render() {
-  const hash = location.hash.slice(1) || 'pers';
+  const hash = location.hash.slice(1) || 'home';
+  if (hash === 'home') {
+    document.body.classList.add('home');
+    document.body.classList.remove('quiz', 'enter');
+    tabsEl.innerHTML = '';
+    view.innerHTML = landingView();
+    view.querySelectorAll('[data-w]').forEach(e => { e.style.width = e.dataset.w + '%'; });
+    prevHome = true;
+    return;
+  }
+  document.body.classList.remove('home');
   const [a, b] = hash.split('/');
   let html = null, tab = a, quiz = false;
   if (a === 'quiz' && DB.open[b]) { html = quizView(b); tab = b; quiz = true; }
@@ -332,6 +377,8 @@ function render() {
     html = tab === 'hist' ? histView() : tab === 'mix' ? mixView() : fachView(tab);
   }
   document.body.classList.toggle('quiz', quiz);
+  document.body.classList.toggle('enter', prevHome && !quiz);
+  prevHome = false;
   renderTabs(tab);
   view.innerHTML = html;
   view.querySelectorAll('[data-w]').forEach(e => { e.style.width = e.dataset.w + '%'; });
@@ -389,6 +436,7 @@ view.addEventListener('click', e => {
     }
     case 'toggle': openDetail = openDetail === el.dataset.id ? null : el.dataset.id; render(); break;
     case 'gohist': go('#hist'); break;
+    case 'home': go('#home'); break;
     case 'openrun': go('#run/' + el.dataset.run); break;
     case 'retry': {
       const run = DB.done.find(x => x.id === el.dataset.run);
