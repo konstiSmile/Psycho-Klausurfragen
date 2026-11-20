@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '1.6';
+const VERSION = '1.7';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
@@ -33,7 +33,7 @@ const BYID = {};
 QUESTIONS.forEach(q => { BYID[q.id] = q; });
 
 /* ---------- Speicher ---------- */
-function blank() { return { v: 1, open: {}, done: [], set: {}, badges: {} }; }
+function blank() { return { v: 1, open: {}, done: [], set: {}, badges: {}, gone: {} }; }
 function load() {
   let d = null;
   try {
@@ -43,12 +43,145 @@ function load() {
   d = d || blank();
   d.set = Object.assign({ theme: 'system', fach: 'pers', goal: 12, examDate: null }, d.set || {});
   d.badges = d.badges || {};
+  d.gone = d.gone || {};
   return d;
 }
 let DB = load();
-function save() {
+function saveLocal() {
   HC = null;
   try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) { /* voll oder gesperrt */ }
+}
+function save() { saveLocal(); syncSoon(); }
+const tomb = id => { if (id) DB.gone[id] = Date.now(); };
+
+/* ---------- Zusammenführen zweier Stände (Sync und Import) ----------
+   Versuche: Vereinigung nach id, gelöschte (gone) bleiben weg. Offene Versuche je Reiter: der zuletzt benutzte gewinnt,
+   der andere wandert mit seinen Antworten in die Versuche. Abzeichen: früheste Zeit. Tagesziel/Klausurdatum: neuere Änderung. */
+function actT(r) { let t = Math.max(r.start || 0, r.end || 0); Object.values(r.at || {}).forEach(x => { if (x > t) t = x; }); return t; }
+function validDB(d) { return !!(d && d.v === 1 && d.open && typeof d.open === 'object' && Array.isArray(d.done)); }
+function merge(a, b) {
+  const gone = Object.assign({}, b.gone || {}, a.gone || {});
+  const done = {};
+  const addDone = r => { if (!r || !r.id || gone[r.id]) return; const o = done[r.id]; if (!o || actT(r) > actT(o)) done[r.id] = r; };
+  a.done.concat(b.done).forEach(addDone);
+  const open = {};
+  new Set(Object.keys(a.open).concat(Object.keys(b.open))).forEach(tab => {
+    const c = [a.open[tab], b.open[tab]].filter(r => r && r.id && !gone[r.id] && !done[r.id]);
+    if (!c.length) return;
+    if (c.length === 2 && c[0].id !== c[1].id) {
+      const [win, lose] = actT(c[1]) > actT(c[0]) ? [c[1], c[0]] : c;
+      open[tab] = win;
+      if (Object.keys(lose.ans || {}).length) addDone(Object.assign({}, lose, { end: lose.exam ? Math.min(actT(lose), lose.start + lose.limit) : actT(lose) }));
+    } else open[tab] = c.length === 2 && actT(c[1]) > actT(c[0]) ? c[1] : c[0];
+  });
+  const badges = Object.assign({}, b.badges || {});
+  Object.entries(a.badges || {}).forEach(([k, t]) => { if (!badges[k] || t < badges[k]) badges[k] = t; });
+  const sa = a.set || {}, sb = b.set || {};
+  const set = Object.assign({}, sa);
+  if ((sb._t || 0) > (sa._t || 0)) ['goal', 'examDate', '_t'].forEach(k => { if (k in sb) set[k] = sb[k]; });
+  return { v: 1, open, done: Object.values(done).sort((x, y) => (x.end || x.start) - (y.end || y.start)), set, badges, gone };
+}
+
+/* ---------- Synchronisation über Supabase (gleicher Code auf allen Geräten) ---------- */
+const SB_URL = 'https://qbdpzamygonpruaafcrt.supabase.co';
+const SB_KEY = 'sb_publishable_A7zukzk82Suux8jteQvLGA_WmXnZb14';
+const SKEY = 'psyklausur-sync';
+const CODE_ABC = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+let SY = { code: null, last: null };
+try { SY = Object.assign(SY, JSON.parse(localStorage.getItem(SKEY)) || {}); } catch (e) { /* leer */ }
+let syncSt = 'idle', syncT = 0, syncBusy = false, syncAgain = false, codeDraft = '', unlinkArmed = false;
+function saveSY() { try { localStorage.setItem(SKEY, JSON.stringify({ code: SY.code, last: SY.last })); } catch (e) { /* egal */ } }
+function newCode() {
+  const r = new Uint32Array(12);
+  crypto.getRandomValues(r);
+  return fmtCode(Array.from(r, x => CODE_ABC[x % CODE_ABC.length]).join(''));
+}
+function fmtCode(raw) {
+  const c = String(raw).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  return c.length === 12 ? c.match(/.{4}/g).join('-') : null;
+}
+async function rpc(fn, body) {
+  const r = await fetch(SB_URL + '/rest/v1/rpc/' + fn, {
+    method: 'POST', cache: 'no-store',
+    headers: { apikey: SB_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const t = await r.text();
+  return t ? JSON.parse(t) : null;
+}
+function syncSoon() { if (!SY.code) return; clearTimeout(syncT); syncT = setTimeout(syncNow, 2500); }
+function syncRedraw(changed) {
+  const h = location.hash;
+  if (/^#set/.test(h) || (changed && !document.body.classList.contains('quiz'))) render();
+}
+async function syncNow() {
+  clearTimeout(syncT);
+  if (!SY.code) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true; syncSt = 'busy'; syncRedraw(false);
+  let changed = false;
+  try {
+    const remote = await rpc('psy_get', { p_code: SY.code });
+    if (validDB(remote)) {
+      const before = JSON.stringify(DB);
+      DB = merge(DB, remote);
+      DB.set = Object.assign({ theme: 'system', fach: 'pers', goal: 12, examDate: null }, DB.set);
+      changed = JSON.stringify(DB) !== before;
+      saveLocal();
+    }
+    await rpc('psy_put', { p_code: SY.code, p_data: DB });
+    SY.last = Date.now(); saveSY();
+    syncSt = 'ok';
+  } catch (e) {
+    syncSt = navigator.onLine === false ? 'offline' : 'err';
+  }
+  syncBusy = false;
+  syncRedraw(changed);
+  if (syncAgain) { syncAgain = false; syncSoon(); }
+}
+async function linkCode(code, isNew) {
+  syncSt = 'busy'; render();
+  try {
+    if (!isNew) {
+      const remote = await rpc('psy_get', { p_code: code });
+      if (!validDB(remote)) { syncSt = 'idle'; toast('Code nicht gefunden'); render(); return; }
+    }
+    SY = { code, last: null }; saveSY(); codeDraft = '';
+    syncSt = 'idle';
+    await syncNow();
+    if (syncSt === 'ok') toast(isNew ? 'Synchronisation eingerichtet' : 'Verbunden – Lernstand abgeglichen');
+  } catch (e) { syncSt = 'idle'; toast('Keine Verbindung – bitte später nochmal'); render(); }
+}
+
+/* ---------- Sicherung als Datei ---------- */
+async function exportFile() {
+  const name = `psyklausur-sicherung-${dayKey(Date.now())}.json`;
+  const blob = new Blob([JSON.stringify(DB)], { type: 'application/json' });
+  try {
+    const file = new File([blob], name, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] }) && matchMedia('(pointer: coarse)').matches) {
+      await navigator.share({ files: [file] });
+      return;
+    }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function importFile(f) {
+  const rd = new FileReader();
+  rd.onload = () => {
+    let d = null;
+    try { d = JSON.parse(rd.result); } catch (e) { d = null; }
+    if (!validDB(d)) { toast('Datei ist keine gültige Sicherung'); return; }
+    DB = merge(DB, Object.assign({ badges: {}, gone: {}, set: {} }, d));
+    DB.set = Object.assign({ theme: 'system', fach: 'pers', goal: 12, examDate: null }, DB.set);
+    save(); render();
+    toast('Sicherung eingelesen');
+  };
+  rd.readAsText(f);
 }
 
 /* ---------- Hilfen ---------- */
@@ -255,6 +388,7 @@ function finishOpen(tab, timeout) {
     save();
     return r;
   }
+  tomb(r.id);
   save();
   return null;
 }
@@ -598,7 +732,7 @@ function newer(a, b) {
   return false;
 }
 function setView() {
-  let h = `<div class="topbar"><button class="back" data-act="setback"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>Zurück</button><span></span></div><h1>Einstellungen</h1><p class="sub">Lernen, Darstellung und App-Version</p>`;
+  let h = `<div class="topbar"><button class="back" data-act="setback"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>Zurück</button><span></span></div><h1>Einstellungen</h1><p class="sub">Lernen, Abgleich, Darstellung und App-Version</p>`;
   h += `<div class="label">Lernen</div><div class="list"><div class="row"><span class="main"><span class="t">Tagesziel</span><span class="d">Fragen pro Tag</span></span></div>` +
     `<div class="seg" role="radiogroup">` + GOALS.map(g => `<button data-act="goal" data-g="${g}" role="radio" aria-checked="${DB.set.goal === g}" class="${DB.set.goal === g ? 'on' : ''}">${g}</button>`).join('') + `</div>` +
     `<label class="row"><span class="main"><span class="t">Klausurdatum</span><span class="d">Für den Countdown auf Gemischt</span></span>` +
@@ -608,6 +742,24 @@ function setView() {
   h += `<div class="label">Darstellung</div><div class="list"><div class="seg" role="radiogroup">` +
     Object.keys(THEMES).map(t => `<button data-act="theme" data-t="${t}" role="radio" aria-checked="${DB.set.theme === t}" class="${DB.set.theme === t ? 'on' : ''}">${t === 'system' ? 'System' : THEMES[t]}</button>`).join('') +
     `</div></div><p class="foot">„System“ folgt der Einstellung deines iPhones.</p>`;
+  h += `<div class="label">Synchronisieren</div><div class="list">`;
+  if (SY.code) {
+    const st = syncSt === 'busy' ? '…' : syncSt === 'err' ? 'Fehler' : syncSt === 'offline' ? 'Keine Verbindung'
+      : SY.last ? (dayKey(SY.last) === dayKey(Date.now()) ? 'heute, ' + fmtDate(SY.last).slice(-5) : fmtDay(SY.last)) : '–';
+    h += `<button class="row" data-act="copycode"><span class="main"><span class="t">Code</span><span class="d">Antippen zum Kopieren</span></span><span class="v code">${esc(SY.code)}</span></button>`;
+    h += `<button class="row accent" data-act="syncnow" ${syncSt === 'busy' ? 'disabled' : ''}><span class="main"><span class="t">Jetzt abgleichen</span></span><span class="v ${syncSt === 'ok' ? 'ok' : syncSt === 'err' ? 'bad' : ''}">${st}</span></button>`;
+    h += `<button class="row danger" data-act="unlink"><span class="main"><span class="t">${unlinkArmed ? 'Wirklich trennen? Nochmal tippen' : 'Synchronisation beenden'}</span></span></button>`;
+    h += `</div><p class="foot">Gib diesen Code auf deinem anderen Gerät ein. Der Lernstand gleicht sich dann automatisch ab. Behalte den Code für dich.</p>`;
+  } else {
+    h += `<button class="row accent" data-act="mkcode" ${syncSt === 'busy' ? 'disabled' : ''}><span class="main"><span class="t">Code erzeugen</span><span class="d">Auf dem ersten Gerät</span></span></button>`;
+    h += `<div class="row"><input class="code-in" data-in="code" value="${esc(codeDraft)}" placeholder="Code vom anderen Gerät" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" maxlength="16" enterkeyhint="go">` +
+      `<button class="pill" data-act="link" ${syncSt === 'busy' ? 'disabled' : ''}>${syncSt === 'busy' ? '…' : 'Verbinden'}</button></div>`;
+    h += `</div><p class="foot">Mit demselben Code auf iPhone und Mac bleibt dein Lernstand überall gleich.</p>`;
+  }
+  h += `<div class="label">Sicherung</div><div class="list">` +
+    `<button class="row accent" data-act="export"><span class="main"><span class="t">Sicherung exportieren</span><span class="d">Lernstand als Datei speichern</span></span></button>` +
+    `<label class="row accent"><span class="main"><span class="t">Sicherung einlesen</span><span class="d">Wird mit dem jetzigen Stand zusammengeführt</span></span><input type="file" class="hidden-file" data-in="import" accept=".json,application/json"></label>` +
+    `</div>`;
   const stTxt = { idle: '', checking: 'Suche …', current: 'Aktuell', offline: 'Keine Verbindung', new: `Version ${upd.remote} verfügbar` }[upd.st];
   const stCls = upd.st === 'current' ? 'ok' : upd.st === 'new' ? 'new' : '';
   h += `<div class="label">App</div><div class="list">`;
@@ -616,7 +768,7 @@ function setView() {
   if (upd.st === 'new') h += `<button class="row accent" data-act="updapply"><span class="main"><span class="t">Jetzt aktualisieren</span><span class="d">Lädt die neue Version. Dein Fortschritt bleibt erhalten.</span></span></button>`;
   h += `</div>`;
   if (upd.at) h += `<p class="foot">Zuletzt geprüft: ${fmtDate(upd.at)}</p>`;
-  h += `<p class="foot">Version ${VERSION} · Alle Ergebnisse bleiben nur auf diesem Gerät gespeichert.</p>`;
+  h += `<p class="foot">Version ${VERSION} · ${SY.code ? 'Lernstand wird über deinen Code abgeglichen.' : 'Alle Ergebnisse bleiben nur auf diesem Gerät gespeichert.'}</p>`;
   return h;
 }
 async function checkUpdate() {
@@ -751,14 +903,18 @@ setInterval(() => {
   });
   document.querySelectorAll('[data-left]').forEach(e => { e.textContent = fmtDur(examLeft(r)); });
 }, 1000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) { HC = null; render(); } });
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) { HC = null; render(); syncNow(); }
+  else if (syncT) syncNow();
+});
+window.addEventListener('online', () => syncNow());
 
 let lastHash = '';
 let navT = 0;
 window.addEventListener('hashchange', () => {
   const h = location.hash;
   if (h !== lastHash) {
-    openDetail = null; delArmed = false; subArmed = false; pick = new Set(); window.scrollTo(0, 0);
+    openDetail = null; delArmed = false; subArmed = false; unlinkArmed = false; pick = new Set(); window.scrollTo(0, 0);
     document.body.classList.add('nav');
     clearTimeout(navT); navT = setTimeout(() => document.body.classList.remove('nav'), 450);
   }
@@ -767,7 +923,15 @@ window.addEventListener('hashchange', () => {
 });
 
 view.addEventListener('change', e => {
-  if (e.target.dataset.in === 'examdate') { DB.set.examDate = e.target.value || null; save(); render(); }
+  if (e.target.dataset.in === 'examdate') { DB.set.examDate = e.target.value || null; DB.set._t = Date.now(); save(); render(); }
+  if (e.target.dataset.in === 'import' && e.target.files[0]) { importFile(e.target.files[0]); e.target.value = ''; }
+});
+
+view.addEventListener('input', e => {
+  if (e.target.dataset.in === 'code') codeDraft = e.target.value;
+});
+view.addEventListener('keydown', e => {
+  if (e.target.dataset.in === 'code' && e.key === 'Enter') { e.preventDefault(); const b = view.querySelector('[data-act="link"]'); if (b) b.click(); }
 });
 
 view.addEventListener('click', e => {
@@ -787,7 +951,7 @@ view.addEventListener('click', e => {
     }
     case 'resume': pick = new Set(); go('#quiz/' + tab); break;
     case 'leave': go('#' + (tab === 'exam' ? 'mix' : tab)); break;
-    case 'discard': delete DB.open[tab]; save(); render(); break;
+    case 'discard': if (r) tomb(r.id); delete DB.open[tab]; save(); render(); break;
     case 'finish': {
       const done = finishOpen(tab);
       go(done ? '#sum/' + done.id : '#' + tab);
@@ -846,8 +1010,19 @@ view.addEventListener('click', e => {
     case 'gohist': go('#hist'); break;
     case 'settings': setFrom = ORDER.includes(prevTab) ? prevTab : 'mix'; go('#set'); break;
     case 'setback': go('#' + setFrom); break;
-    case 'goal': DB.set.goal = +el.dataset.g; save(); render(); break;
-    case 'clrdate': DB.set.examDate = null; save(); render(); break;
+    case 'goal': DB.set.goal = +el.dataset.g; DB.set._t = Date.now(); save(); render(); break;
+    case 'clrdate': DB.set.examDate = null; DB.set._t = Date.now(); save(); render(); break;
+    case 'mkcode': linkCode(newCode(), true); break;
+    case 'link': { const c = fmtCode(codeDraft); if (!c) { toast('Der Code hat 12 Zeichen'); break; } linkCode(c, false); break; }
+    case 'copycode': navigator.clipboard && navigator.clipboard.writeText(SY.code).then(() => toast('Code kopiert'), () => {}); break;
+    case 'syncnow': syncNow(); break;
+    case 'unlink': {
+      if (!unlinkArmed) { unlinkArmed = true; render(); break; }
+      unlinkArmed = false; SY = { code: null, last: null }; saveSY(); syncSt = 'idle'; render();
+      toast('Synchronisation beendet – Lernstand bleibt auf diesem Gerät');
+      break;
+    }
+    case 'export': exportFile(); break;
     case 'theme': DB.set.theme = el.dataset.t; save(); applyTheme(DB.set.theme); render(); break;
     case 'updcheck': checkUpdate(); break;
     case 'updapply': applyUpdate(); break;
@@ -861,6 +1036,7 @@ view.addEventListener('click', e => {
     }
     case 'del': {
       if (!delArmed) { delArmed = true; render(); break; }
+      tomb(el.dataset.run);
       DB.done = DB.done.filter(y => y.id !== el.dataset.run);
       save();
       go('#hist');
@@ -871,6 +1047,7 @@ view.addEventListener('click', e => {
 
 render();
 lastHash = location.hash;
+syncNow();
 
 /* Wischen zwischen den Reitern (nicht in Prüfungen und Einstellungen) */
 let sw = null;

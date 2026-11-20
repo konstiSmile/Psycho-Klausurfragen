@@ -476,3 +476,13 @@ label.row { cursor: pointer; }
   box-shadow: 0 8px 24px var(--shadow); transition: opacity .3s ease, transform .3s ease; text-align: center;
 }
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* Synchronisieren & Sicherung */
+.code-in { flex: 1; min-width: 0; font: inherit; font-size: 17px; letter-spacing: 1px; text-transform: uppercase; color: var(--text); background: var(--card2); border: 0; border-radius: 8px; padding: 8px 10px; }
+.code-in::placeholder { text-transform: none; letter-spacing: 0; color: var(--muted); }
+.pill { flex: none; font-size: 16px; font-weight: 600; color: var(--accent); padding: 8px 4px 8px 6px; }
+.pill[disabled] { opacity: .4; }
+.row .v.code { font-variant-numeric: tabular-nums; letter-spacing: 1px; color: var(--text); }
+.row .v.bad { color: var(--bad); }
+label.row.accent .t { color: var(--accent); }
+.hidden-file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
