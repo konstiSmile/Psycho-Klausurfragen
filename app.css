@@ -492,3 +492,23 @@ label.row.accent .t { color: var(--accent); }
 @media (hover: hover) and (pointer: fine) {
   .keys { display: block; text-align: center; color: var(--muted); font-size: 12px; margin: 10px 0 0; opacity: .8; }
 }
+
+/* Mac: Einstellungen als schwebende Blase neben der Leiste; Handy unverändert */
+.gearbub { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  #tabs { display: flex; justify-content: center; align-items: center; gap: 10px; }
+  #tabs .pill { flex: 1 1 auto; margin: 0; }
+  #tabs::before { content: ""; width: 58px; flex: none; }
+  .gearbub {
+    pointer-events: auto; display: grid; place-items: center; flex: none; width: 58px; height: 58px; border-radius: 50%;
+    color: var(--muted); cursor: pointer;
+    background: var(--glass); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--glassline); box-shadow: 0 8px 26px var(--shadow);
+  }
+  .gearbub svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .4s ease; }
+  .gearbub:hover { color: var(--text); }
+  .gearbub:hover svg { transform: rotate(45deg); }
+  body.enter .gearbub { animation: barin .55s cubic-bezier(.2, .9, .25, 1.15) .05s both; }
+  .topbar .gear { visibility: hidden; }
+  #tabs a, button.row, .btn, .seg button { cursor: pointer; }
+}

@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '1.8';
+const VERSION = '1.9';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
@@ -407,11 +407,14 @@ function buildTabs() {
   tabsEl.innerHTML = `<div class="pill"><span class="glow"></span>` +
     `<a href="#${DB.set.fach || 'pers'}" class="grp" data-t="grp"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON.grp}</svg><span>Bereiche</span></a>` +
     TABS.map(([id, name]) => `<a href="#${id}" data-t="${id}" class="${FACH[id] ? 'f' : ''}">` +
-      `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg><span>${SHORT[id] || name}</span></a>`).join('') + `</div>`;
+      `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg><span>${SHORT[id] || name}</span></a>`).join('') + `</div>` +
+    `<button class="gearbub" aria-label="Einstellungen"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON.gear}</svg></button>`;
 }
+function openSettings() { setFrom = ORDER.includes(prevTab) ? prevTab : 'mix'; go('#set'); }
+tabsEl.addEventListener('click', e => { if (e.target.closest('.gearbub')) openSettings(); });
 function renderTabs(active) {
   if (!tabsEl.firstChild) buildTabs();
-  const pill = tabsEl.firstChild;
+  const pill = tabsEl.querySelector('.pill');
   const open = !!FACH[active];
   pill.classList.toggle('open', open);
   pill.querySelector('.grp').setAttribute('href', '#' + (DB.set.fach || 'pers'));
@@ -1008,7 +1011,7 @@ view.addEventListener('click', e => {
     }
     case 'toggle': openDetail = openDetail === el.dataset.id ? null : el.dataset.id; render(); break;
     case 'gohist': go('#hist'); break;
-    case 'settings': setFrom = ORDER.includes(prevTab) ? prevTab : 'mix'; go('#set'); break;
+    case 'settings': openSettings(); break;
     case 'setback': go('#' + setFrom); break;
     case 'goal': DB.set.goal = +el.dataset.g; DB.set._t = Date.now(); save(); render(); break;
     case 'clrdate': DB.set.examDate = null; DB.set._t = Date.now(); save(); render(); break;
@@ -1080,6 +1083,9 @@ document.addEventListener('keydown', e => {
     const cur = ORDER.indexOf(hash.split('/')[0]);
     const nx = cur + (k === 'ArrowRight' ? 1 : -1);
     if (cur >= 0 && nx >= 0 && nx < ORDER.length) { go('#' + ORDER[nx]); done = true; }
+    else if (cur === ORDER.length - 1 && nx === ORDER.length) { openSettings(); done = true; }
+  } else if (k === 'ArrowLeft' && document.body.classList.contains('set')) {
+    done = press('[data-act="setback"]');
   }
   if (done) e.preventDefault();
 });
