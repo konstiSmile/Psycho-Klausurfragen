@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '2.2';
+const VERSION = '2.3';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
@@ -636,6 +636,7 @@ function quizView(tab) {
   if (!done) h += `<button class="btn primary" data-act="check" data-tab="${tab}">${pick.size ? 'Prüfen' : 'Prüfen (nichts angekreuzt)'}</button>`;
   else if (!last) h += `<button class="btn primary" data-act="next" data-tab="${tab}">Weiter</button>`;
   else h += `<button class="btn primary" data-act="finish" data-tab="${tab}">Auswertung</button>`;
+  if (done) h += markBtn(q.id);
   h += `</div></div><p class="keys">1–4 ankreuzen · Enter prüfen/weiter · ← → blättern · Esc zurück</p>`;
   return h;
 }
@@ -857,10 +858,13 @@ function selectTile(id) {
 
 /* Knopf + Notiz unter der Auflösung (nur Abfragen, nicht Klausur-Modus) */
 function markHtml(id) {
+  if (!isMarked(id)) return '';
+  return `<div class="mkhead">Markiert zum Klären</div><textarea class="mnote" data-in="mnote" data-id="${id}" rows="2" maxlength="500" placeholder="Was ist unklar? (optional)">${esc(DB.marks[id].note || '')}</textarea>`;
+}
+/* Gelbe Blase rechts neben „Weiter“ */
+function markBtn(id) {
   const on = isMarked(id);
-  let h = `<button class="flagbtn mark ${on ? 'on' : ''}" data-act="mark" data-id="${id}" aria-pressed="${on}"><span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 12.5 4 4 8-9"/></svg></span>Mit Folien klären</button>`;
-  if (on) h += `<textarea class="mnote" data-in="mnote" data-id="${id}" rows="2" maxlength="500" placeholder="Was ist unklar? (optional)">${esc(DB.marks[id].note || '')}</textarea>`;
-  return h;
+  return `<button class="btn mkb ${on ? 'on' : ''}" data-act="mark" data-id="${id}" aria-pressed="${on}" aria-label="${on ? 'Markierung entfernen' : 'Mit Folien klären'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4"/><path d="M6 4h11l-2.2 4L17 12H6"/></svg></button>`;
 }
 /* Liste „Zum Klären“ unter Versuche */
 function markList() {
