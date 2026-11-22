@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '2.3';
+const VERSION = '2.4';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
@@ -838,9 +838,13 @@ function mosaic() {
     const ids = ofFach(f);
     const m = ids.filter(id => lvl(id) === 3).length;
     h += `<div class="mblock"><div class="mh"><span>${FACH[f]}</span><span>${m} / ${ids.length} gemeistert</span></div><div class="mgrid">` +
-      ids.map(id => {
-        const x = H().q[id];
-        return `<i data-q="${id}" class="${x ? 'h' + heat(x.avg) : ''}${mosSel === id ? ' sel' : ''}">${x && x.lvl === 3 ? CROWN : ''}</i>`;
+      EXAMS.map(([e, , kurz]) => {
+        const g = ofExam(ids, e);
+        if (!g.length) return '';
+        return `<div class="mgrp c${Math.min(6, Math.max(3, Math.ceil(g.length / 3)))}" title="${kurz}">` + g.map(id => {
+          const x = H().q[id];
+          return `<i data-q="${id}" class="${x ? 'h' + heat(x.avg) : ''}${mosSel === id ? ' sel' : ''}">${x && x.lvl === 3 ? CROWN : ''}</i>`;
+        }).join('') + `</div>`;
       }).join('') + `</div></div>`;
   });
   h += `<div class="minfo" data-minfo>${mosInfo(mosSel)}</div>`;
