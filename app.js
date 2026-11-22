@@ -1,7 +1,7 @@
 'use strict';
 /* Altklausuren Psycho 2 – Abfrage-App. Daten: data.js (QUESTIONS). Speicher nur lokal. */
 
-const VERSION = '2.1';
+const VERSION = '2.2';
 const KEY = 'psyklausur-v1';
 const LETTERS = ['A', 'B', 'C', 'D'];
 const FACH = { pers: 'Persönlichkeit', entw: 'Entwicklung', diag: 'Diagnostik' };
@@ -38,7 +38,7 @@ const BYID = {};
 QUESTIONS.forEach(q => { BYID[q.id] = q; });
 
 /* ---------- Speicher ---------- */
-function blank() { return { v: 1, open: {}, done: [], set: {}, badges: {}, gone: {} }; }
+function blank() { return { v: 1, open: {}, done: [], set: {}, badges: {}, gone: {}, marks: {} }; }
 function load() {
   let d = null;
   try {
@@ -49,6 +49,7 @@ function load() {
   d.set = Object.assign({ theme: 'system', fach: 'pers', goal: 12, examDate: null }, d.set || {});
   d.badges = d.badges || {};
   d.gone = d.gone || {};
+  d.marks = d.marks || {};
   return d;
 }
 let DB = load();
@@ -58,6 +59,11 @@ function saveLocal() {
 }
 function save() { saveLocal(); syncSoon(); }
 const tomb = id => { if (id) DB.gone[id] = Date.now(); };
+
+/* ---------- Markierte Fragen („Mit Folien klären“): marks[id] = { on, note, t } ---------- */
+const isMarked = id => !!(DB.marks[id] && DB.marks[id].on);
+const markedIds = () => QUESTIONS.filter(q => isMarked(q.id)).map(q => q.id);
+function setMark(id, on) { const m = DB.marks[id] || { note: '' }; DB.marks[id] = { on, note: m.note || '', t: Date.now() }; save(); }
 
 /* ---------- Zusammenführen zweier Stände (Sync und Import) ----------
    Versuche: Vereinigung nach id, gelöschte (gone) bleiben weg. Offene Versuche je Reiter: der zuletzt benutzte gewinnt,
@@ -84,7 +90,10 @@ function merge(a, b) {
   const sa = a.set || {}, sb = b.set || {};
   const set = Object.assign({}, sa);
   if ((sb._t || 0) > (sa._t || 0)) ['goal', 'examDate', '_t'].forEach(k => { if (k in sb) set[k] = sb[k]; });
-  return { v: 1, open, done: Object.values(done).sort((x, y) => (x.end || x.start) - (y.end || y.start)), set, badges, gone };
+  /* Markierungen: je Frage gewinnt die neuere Änderung */
+  const marks = Object.assign({}, b.marks || {});
+  Object.entries(a.marks || {}).forEach(([k, m]) => { if (!marks[k] || (m.t || 0) >= (marks[k].t || 0)) marks[k] = m; });
+  return { v: 1, open, done: Object.values(done).sort((x, y) => (x.end || x.start) - (y.end || y.start)), set, badges, gone, marks };
 }
 
 /* ---------- Synchronisation über Supabase (gleicher Code auf allen Geräten) ---------- */
@@ -181,7 +190,7 @@ function importFile(f) {
     let d = null;
     try { d = JSON.parse(rd.result); } catch (e) { d = null; }
     if (!validDB(d)) { toast('Datei ist keine gültige Sicherung'); return; }
-    DB = merge(DB, Object.assign({ badges: {}, gone: {}, set: {} }, d));
+    DB = merge(DB, Object.assign({ badges: {}, gone: {}, set: {}, marks: {} }, d));
     DB.set = Object.assign({ theme: 'system', fach: 'pers', goal: 12, examDate: null }, DB.set);
     save(); render();
     toast('Sicherung eingelesen');
@@ -541,6 +550,8 @@ function mixView() {
   h += row('start', `Alle ${QUESTIONS.length} Fragen gemischt`, '', '', 'data-tab="mix" data-kind="shuf"');
   h += row('start', '20 zufällige Fragen', 'Kurze Runde', '', 'data-tab="mix" data-kind="r20"');
   h += row('start', 'Bisher Falsche', 'Aus allen Bereichen', String(wrong), `data-tab="mix" data-kind="wrong" ${wrong ? '' : 'disabled'}`);
+  const nMark = markedIds().length;
+  if (nMark) h += row('start', 'Markierte üben', 'Zum Klären mit den Folien', String(nMark), 'data-tab="mix" data-kind="marked"');
   h += `</div><div class="label">Klausur-Modus · ${EXAM_MIN} Minuten</div><div class="list">`;
   h += row('start', 'Probeklausur als Prüfung', '36 Fragen · Auflösung erst nach dem Abgeben', '', `data-tab="exam" data-kind="probe" ${exOpen ? 'disabled' : ''}`);
   EXAMS.forEach(([y]) => {
@@ -566,6 +577,7 @@ function buildIds(tab, kind) {
   if (kind === 'r12') return R(shuffle(pool).slice(0, 12), `${name} · 12 zufällige`);
   if (kind === 'r20') return R(shuffle(pool).slice(0, 20), 'Gemischt · 20 zufällige');
   if (kind === 'wrong') return R(shuffle(pool.filter(id => last[id] && !last[id].full)), `${name} · bisher Falsche`);
+  if (kind === 'marked') return R(pool.filter(isMarked), `${name} · zum Klären`);
   if (kind === 'new') return R(pool.filter(id => !last[id]), `${name} · noch nie beantwortet`);
   if (kind === 'probe') {
     const ids = [].concat(...Object.keys(FACH).map(f => shuffle(ofFach(f)).slice(0, 12)));
@@ -616,6 +628,7 @@ function quizView(tab) {
     if (q.h.length) {
       h += `<div class="hints">` + q.h.map(([t, msg]) => `<div><b>${MARK[t] || esc(t)}</b>${esc(msg)}</div>`).join('') + `</div>`;
     }
+    h += markHtml(q.id);
   }
   const last = r.pos === r.ids.length - 1;
   h += `<div class="action"><div class="in">`;
@@ -842,6 +855,33 @@ function selectTile(id) {
   if (inf) inf.innerHTML = mosInfo(id);
 }
 
+/* Knopf + Notiz unter der Auflösung (nur Abfragen, nicht Klausur-Modus) */
+function markHtml(id) {
+  const on = isMarked(id);
+  let h = `<button class="flagbtn mark ${on ? 'on' : ''}" data-act="mark" data-id="${id}" aria-pressed="${on}"><span class="box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 12.5 4 4 8-9"/></svg></span>Mit Folien klären</button>`;
+  if (on) h += `<textarea class="mnote" data-in="mnote" data-id="${id}" rows="2" maxlength="500" placeholder="Was ist unklar? (optional)">${esc(DB.marks[id].note || '')}</textarea>`;
+  return h;
+}
+/* Liste „Zum Klären“ unter Versuche */
+function markList() {
+  const ids = markedIds();
+  if (!ids.length) return '';
+  let h = `<div class="label">Zum Klären · ${ids.length}</div><div class="list">`;
+  h += row('start', 'Alle markierten üben', 'In Klausur-Reihenfolge', '', 'data-tab="mix" data-kind="marked"');
+  ids.forEach(id => {
+    const q = BYID[id], note = DB.marks[id].note;
+    h += `<button class="row" data-act="toggle" data-id="${id}"><span class="dot mk"></span><span class="main">` +
+      `<span class="t">${EXS[q.e]} · Frage ${q.n} · ${FACH[q.f]}</span><span class="d">${esc(note || q.t)}</span></span></button>`;
+    if (openDetail === id) {
+      h += `<div class="detail"><p>${esc(q.q)}</p><ul>` + LETTERS.map((L, i) =>
+        `<li class="${q.k.includes(L) ? 'good' : ''}">${L}) ${esc(q.o[i])} – ${isVoid(q, L) ? 'nicht gewertet' : q.k.includes(L) ? 'richtig' : 'falsch'}</li>`).join('') + `</ul>` +
+        `<p>Thema: ${esc(q.t)}</p>` + (note ? `<p class="mknote">Notiz: ${esc(note)}</p>` : '') +
+        `<div class="mkact"><button class="btn plain" data-act="unmark" data-id="${id}">Erledigt</button><button class="btn primary" data-act="one" data-id="${id}">Üben</button></div></div>`;
+    }
+  });
+  return h + `</div>`;
+}
+
 function histView() {
   const last = lastStatus();
   let h = gearBtn() + `<h1>Versuche</h1><p class="sub">Fortschritt, Abzeichen und abgeschlossene Abfragen</p>`;
@@ -859,6 +899,7 @@ function histView() {
       return row('resume', esc(r.title), `${s.answered} von ${s.total} beantwortet`, '', `data-tab="${r.tab}"`);
     }).join('') + `</div>`;
   }
+  h += markList();
   h += `<div class="label">Abgeschlossen</div>`;
   if (!DB.done.length) h += `<div class="list"><div class="empty">Noch keine abgeschlossenen Versuche.</div></div>`;
   else {
@@ -882,7 +923,14 @@ function go(hash) {
   if (location.hash === hash) render(); else location.hash = hash;
 }
 let prevTab = null, first = true, setFrom = 'mix';
+/* Während eine Notiz getippt wird, nicht neu zeichnen (Fokus bliebe sonst nicht erhalten) */
+let renderLater = false;
+view.addEventListener('focusout', e => {
+  if (e.target.dataset && e.target.dataset.in === 'mnote' && renderLater) { renderLater = false; setTimeout(render, 0); }
+});
 function render() {
+  const ae = document.activeElement;
+  if (ae && ae.dataset && ae.dataset.in === 'mnote' && view.contains(ae)) { renderLater = true; return; }
   if (DB.open.exam && examLeft(DB.open.exam) <= 0) {
     const d = finishOpen('exam', true);
     if (/^#(quiz|grid)\/exam/.test(location.hash)) { location.replace('#sum/' + d.id); }
@@ -971,6 +1019,10 @@ view.addEventListener('mouseover', e => {
 });
 view.addEventListener('input', e => {
   if (e.target.dataset.in === 'code') codeDraft = e.target.value;
+  if (e.target.dataset.in === 'mnote') {
+    const m = DB.marks[e.target.dataset.id];
+    if (m) { m.note = e.target.value.slice(0, 500); m.t = Date.now(); saveLocal(); syncSoon(); }
+  }
 });
 view.addEventListener('keydown', e => {
   if (e.target.dataset.in === 'code' && e.key === 'Enter') { e.preventDefault(); const b = view.querySelector('[data-act="link"]'); if (b) b.click(); }
@@ -1051,6 +1103,8 @@ view.addEventListener('click', e => {
       break;
     }
     case 'toggle': openDetail = openDetail === el.dataset.id ? null : el.dataset.id; render(); break;
+    case 'mark': setMark(el.dataset.id, !isMarked(el.dataset.id)); render(); break;
+    case 'unmark': setMark(el.dataset.id, false); if (openDetail === el.dataset.id) openDetail = null; render(); break;
     case 'gohist': go('#hist'); break;
     case 'one': {
       const q = BYID[el.dataset.id];
