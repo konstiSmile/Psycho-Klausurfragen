@@ -414,11 +414,13 @@ html, body, .qtop { transition: background-color .45s ease; }
 .mh { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
 .mh span:first-child { color: var(--text); font-weight: 500; }
 .mgrid { display: flex; gap: 4px; }
-.mgrp { display: grid; gap: 3px; padding: 2px; border: 1px solid var(--line); border-radius: 5px; min-width: 0; }
-.mgrp.c3 { flex: 3; grid-template-columns: repeat(3, 1fr); }
-.mgrp.c4 { flex: 4; grid-template-columns: repeat(4, 1fr); }
-.mgrp.c5 { flex: 5; grid-template-columns: repeat(5, 1fr); }
-.mgrp.c6 { flex: 6; grid-template-columns: repeat(6, 1fr); }
+.mcol { display: flex; flex-direction: column; min-width: 0; }
+.mgrp { display: grid; gap: 3px; padding: 2px; border: 1px solid var(--line); border-radius: 5px; }
+.mlab { margin-top: 3px; font-size: 11px; line-height: 1.2; color: var(--muted); text-align: center; white-space: nowrap; }
+.mcol.c3 { flex: 3 1 6px; } .mcol.c3 .mgrp { grid-template-columns: repeat(3, 1fr); }
+.mcol.c4 { flex: 4 1 6px; } .mcol.c4 .mgrp { grid-template-columns: repeat(4, 1fr); }
+.mcol.c5 { flex: 5 1 6px; } .mcol.c5 .mgrp { grid-template-columns: repeat(5, 1fr); }
+.mcol.c6 { flex: 6 1 6px; } .mcol.c6 .mgrp { grid-template-columns: repeat(6, 1fr); }
 .mgrid i, .mlegend i { display: grid; place-items: center; aspect-ratio: 1; border-radius: 3px; background: var(--card2); }
 .mlegend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 12px; font-size: 12px; color: var(--muted); }
 .mlegend span { display: inline-flex; align-items: center; gap: 5px; }
